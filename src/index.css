@@ -17,8 +17,9 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 217 91% 70%;
 
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -26,15 +27,37 @@ All colors MUST be HSL.
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 45 93% 58%;
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --ring: 217 91% 60%;
+    
+    /* Real Estate Design System */
+    --real-estate-blue: 217 91% 60%;
+    --real-estate-navy: 222 47% 11%;
+    --real-estate-gold: 45 93% 58%;
+    --real-estate-green: 142 76% 36%;
+    --real-estate-gray: 215 16% 47%;
+    --real-estate-light-gray: 210 40% 96%;
+    
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(var(--real-estate-blue)) 0%, hsl(var(--real-estate-navy)) 100%);
+    --gradient-card: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+    --gradient-subtle: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--real-estate-light-gray)) 100%);
+    
+    /* Shadows */
+    --shadow-elegant: 0 10px 30px -10px hsl(var(--real-estate-blue) / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(var(--real-estate-gray) / 0.15);
+    --shadow-hover: 0 15px 35px -5px hsl(var(--real-estate-blue) / 0.25);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
     --radius: 0.5rem;
 
