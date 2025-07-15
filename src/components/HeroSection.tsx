@@ -39,10 +39,16 @@ const HeroSection = () => {
               
               <select className="h-12 px-4 rounded-md border border-real-estate-gray/20 focus:border-real-estate-blue outline-none">
                 <option>Property Type</option>
-                <option>House</option>
-                <option>Apartment</option>
-                <option>Bedsitter</option>
-                <option>Villa</option>
+                <option>Bedsitters</option>
+                <option>Single Rooms</option>
+                <option>One Bedrooms</option>
+                <option>Two Bedrooms</option>
+                <option>Three Bedrooms</option>
+                <option>Apartments</option>
+                <option>Business Rooms</option>
+                <option>Offices</option>
+                <option>Lodgings</option>
+                <option>BNB</option>
               </select>
               
               <Button variant="search" size="lg" className="h-12">
