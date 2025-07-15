@@ -1,24 +1,24 @@
 const StatsSection = () => {
   const stats = [
     {
-      number: "50K+",
-      label: "Properties Listed",
-      description: "Active listings across the region"
+      number: "15K+",
+      label: "Rentals Available",
+      description: "Active rental listings across Kenya"
     },
     {
-      number: "25K+",
-      label: "Happy Customers",
-      description: "Successful transactions completed"
+      number: "8K+",
+      label: "Happy Tenants",
+      description: "Successful rental placements"
     },
     {
-      number: "500+",
-      label: "Expert Agents",
-      description: "Professional real estate agents"
+      number: "300+",
+      label: "Trusted Landlords",
+      description: "Verified property owners"
     },
     {
-      number: "99%",
+      number: "95%",
       label: "Success Rate",
-      description: "Customer satisfaction rating"
+      description: "Tenant satisfaction rating"
     }
   ];
 

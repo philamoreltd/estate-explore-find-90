@@ -17,11 +17,11 @@ const HeroSection = () => {
         <div className="text-center w-full">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-fade-in">
             Find Your Perfect
-            <span className="block text-real-estate-gold">Dream Home</span>
+            <span className="block text-real-estate-gold">Rental Home</span>
           </h1>
           
           <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto animate-slide-up">
-            Discover thousands of properties for sale and rent in your area
+            Discover thousands of rental properties available in Kenya
           </p>
 
           {/* Search Bar */}
@@ -41,8 +41,8 @@ const HeroSection = () => {
                 <option>Property Type</option>
                 <option>House</option>
                 <option>Apartment</option>
-                <option>Condo</option>
-                <option>Townhouse</option>
+                <option>Bedsitter</option>
+                <option>Villa</option>
               </select>
               
               <Button variant="search" size="lg" className="h-12">
@@ -53,10 +53,10 @@ const HeroSection = () => {
             
             {/* Quick Filters */}
             <div className="flex flex-wrap gap-3 mt-6 justify-center">
-              <Button variant="property" size="sm">For Sale</Button>
-              <Button variant="property" size="sm">For Rent</Button>
-              <Button variant="property" size="sm">New Homes</Button>
-              <Button variant="property" size="sm">Open Houses</Button>
+              <Button variant="property" size="sm">Monthly Rent</Button>
+              <Button variant="property" size="sm">Furnished</Button>
+              <Button variant="property" size="sm">Unfurnished</Button>
+              <Button variant="property" size="sm">Short Term</Button>
             </div>
           </div>
         </div>

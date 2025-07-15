@@ -11,7 +11,7 @@ const Navigation = () => {
             <div className="flex-shrink-0 flex items-center">
               <Home className="h-8 w-8 text-real-estate-blue mr-2" />
               <span className="text-2xl font-bold text-real-estate-navy">
-                EstateFind
+                RentFind
               </span>
             </div>
           </div>
@@ -20,16 +20,16 @@ const Navigation = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
               <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Buy
+                Browse Rentals
               </a>
               <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Sell
+                List Property
               </a>
               <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Rent
+                Landlords
               </a>
               <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Agents
+                Tenants
               </a>
             </div>
           </div>
@@ -45,7 +45,7 @@ const Navigation = () => {
               Sign In
             </Button>
             <Button variant="hero" size="sm">
-              List Property
+              List Rental
             </Button>
           </div>
 
