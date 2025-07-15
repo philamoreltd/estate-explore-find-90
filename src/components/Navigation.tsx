@@ -11,7 +11,7 @@ const Navigation = () => {
             <div className="flex-shrink-0 flex items-center">
               <Home className="h-8 w-8 text-real-estate-blue mr-2" />
               <span className="text-2xl font-bold text-real-estate-navy">
-                RentFind
+                NyumbaLink
               </span>
             </div>
           </div>
