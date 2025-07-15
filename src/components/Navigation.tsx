@@ -22,8 +22,8 @@ const Navigation = () => {
               <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Browse Rentals
               </a>
-              <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                List Property
+              <a href="/tenants" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
+                Add Property
               </a>
               <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Landlords

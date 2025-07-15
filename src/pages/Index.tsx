@@ -27,7 +27,7 @@ const Index = () => {
               <h4 className="font-semibold mb-4">Services</h4>
               <ul className="space-y-2 text-sm text-white/80">
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Find Rentals</a></li>
-                <li><a href="#" className="hover:text-real-estate-gold transition-colors">List Property</a></li>
+                <li><a href="/tenants" className="hover:text-real-estate-gold transition-colors">Add Property</a></li>
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Tenant Screening</a></li>
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Property Management</a></li>
               </ul>
