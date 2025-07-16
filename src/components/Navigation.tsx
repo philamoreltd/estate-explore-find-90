@@ -1,7 +1,31 @@
 import { Button } from "@/components/ui/button";
-import { Home, Search, Heart, User, Menu } from "lucide-react";
+import { Home, Search, Heart, User, Menu, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const Navigation = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Signed out successfully",
+        description: "You have been signed out of your account.",
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      toast({
+        title: "Error",
+        description: "Failed to sign out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
   return (
     <nav className="bg-white shadow-card border-b border-real-estate-gray/10 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,11 +64,23 @@ const Navigation = () => {
               <Heart className="h-4 w-4 mr-2" />
               Saved
             </Button>
-            <Button variant="outline" size="sm">
-              <User className="h-4 w-4 mr-2" />
-              Sign In
-            </Button>
-            <Button variant="hero" size="sm">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <span className="text-sm text-real-estate-navy">
+                  Hello, {user.user_metadata?.full_name || user.email}
+                </span>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
+                <User className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            )}
+            <Button variant="hero" size="sm" onClick={() => navigate("/tenants")}>
               List Rental
             </Button>
           </div>
