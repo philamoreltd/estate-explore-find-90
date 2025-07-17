@@ -7,6 +7,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Index from "./pages/Index";
 import Tenants from "./pages/Tenants";
+import Landlords from "./pages/Landlords";
+import Browse from "./pages/Browse";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -21,6 +23,12 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/landlords" element={
+              <ProtectedRoute>
+                <Landlords />
+              </ProtectedRoute>
+            } />
             <Route path="/tenants" element={
               <ProtectedRoute>
                 <Tenants />

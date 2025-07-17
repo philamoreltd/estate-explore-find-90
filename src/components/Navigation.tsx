@@ -43,17 +43,14 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
-              <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
+              <a href="/browse" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Browse Rentals
               </a>
               <a href="/tenants" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Add Property
               </a>
-              <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
+              <a href="/landlords" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Landlords
-              </a>
-              <a href="#" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Tenants
               </a>
             </div>
           </div>
