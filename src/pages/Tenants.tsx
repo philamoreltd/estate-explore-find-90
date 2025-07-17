@@ -209,7 +209,7 @@ const Tenants = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="rent_amount">Monthly Rent (KES)</Label>
+                  <Label htmlFor="rent_amount">Monthly Rent (KSH)</Label>
                   <div className="relative mt-1">
                     <DollarSign className="absolute left-3 top-3 h-4 w-4 text-real-estate-gray" />
                     <Input 
