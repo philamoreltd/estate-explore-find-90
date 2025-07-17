@@ -66,6 +66,11 @@ const Navigation = () => {
                 <span className="text-sm text-real-estate-navy">
                   Hello, {user.user_metadata?.full_name || user.email}
                 </span>
+                {user.email === 'antonygmurimi@gmail.com' && (
+                  <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
+                    Admin Panel
+                  </Button>
+                )}
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
                   <LogOut className="h-4 w-4 mr-2" />
                   Sign Out
