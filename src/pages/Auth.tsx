@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, Mail, Lock, User, AlertCircle } from "lucide-react";
+import { Home, Mail, Lock, User, AlertCircle, Phone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -17,6 +17,7 @@ const Auth = () => {
     email: "",
     password: "",
     fullName: "",
+    phone: "",
     confirmPassword: ""
   });
   const [signInData, setSignInData] = useState({
@@ -46,6 +47,12 @@ const Auth = () => {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(signUpData.email)) {
       newErrors.email = "Please enter a valid email address";
+    }
+    
+    if (!signUpData.phone.trim()) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(signUpData.phone)) {
+      newErrors.phone = "Please enter a valid phone number";
     }
     
     if (!signUpData.password) {
@@ -95,6 +102,7 @@ const Auth = () => {
           emailRedirectTo: redirectUrl,
           data: {
             full_name: signUpData.fullName,
+            phone: signUpData.phone,
           }
         }
       });
@@ -118,6 +126,7 @@ const Auth = () => {
         email: "",
         password: "",
         fullName: "",
+        phone: "",
         confirmPassword: ""
       });
       
@@ -288,6 +297,25 @@ const Auth = () => {
                   </div>
                   {errors.email && (
                     <p className="text-sm text-destructive">{errors.email}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-phone">Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="signup-phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={signUpData.phone}
+                      onChange={(e) => setSignUpData({ ...signUpData, phone: e.target.value })}
+                      className="pl-10"
+                      disabled={isLoading}
+                    />
+                  </div>
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone}</p>
                   )}
                 </div>
                 
