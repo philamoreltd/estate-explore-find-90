@@ -25,6 +25,8 @@ const Tenants = () => {
     description: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -38,6 +40,44 @@ const Tenants = () => {
         ...prev,
         [name]: ""
       }));
+    }
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadImage = async (file: File, propertyId: string): Promise<string | null> => {
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}/${propertyId}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('property-images')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        return null;
+      }
+
+      const { data } = supabase.storage
+        .from('property-images')
+        .getPublicUrl(fileName);
+
+      return data.publicUrl;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      return null;
     }
   };
 
@@ -80,6 +120,7 @@ const Tenants = () => {
     setIsLoading(true);
     
     try {
+      // First create the property
       const propertyData = {
         user_id: user?.id,
         title: formData.title,
@@ -93,9 +134,11 @@ const Tenants = () => {
         status: 'available'
       };
 
-      const { error } = await supabase
+      const { data: property, error } = await supabase
         .from('properties')
-        .insert([propertyData]);
+        .insert([propertyData])
+        .select()
+        .single();
 
       if (error) {
         console.error('Error creating property:', error);
@@ -105,6 +148,24 @@ const Tenants = () => {
           variant: "destructive",
         });
         return;
+      }
+
+      // Upload image if selected
+      let imageUrl = null;
+      if (selectedImage && property) {
+        imageUrl = await uploadImage(selectedImage, property.id);
+        
+        if (imageUrl) {
+          // Update property with image URL
+          const { error: updateError } = await supabase
+            .from('properties')
+            .update({ image_url: imageUrl })
+            .eq('id', property.id);
+
+          if (updateError) {
+            console.error('Error updating property with image:', updateError);
+          }
+        }
       }
 
       toast({
@@ -123,6 +184,8 @@ const Tenants = () => {
         size_sqft: "",
         description: "",
       });
+      setSelectedImage(null);
+      setImagePreview(null);
       
     } catch (error) {
       console.error('Error creating property:', error);
@@ -313,14 +376,42 @@ const Tenants = () => {
               
               <div>
                 <Label htmlFor="images">Property Images</Label>
-                <div className="mt-1 border-2 border-dashed border-real-estate-gray/30 rounded-lg p-6 text-center">
-                  <Upload className="h-8 w-8 text-real-estate-gray mx-auto mb-2" />
-                  <p className="text-real-estate-gray">
-                    Click to upload images or drag and drop
-                  </p>
-                  <p className="text-sm text-real-estate-gray/80 mt-1">
-                    PNG, JPG, GIF up to 10MB
-                  </p>
+                <div className="mt-1">
+                  <input
+                    type="file"
+                    id="images"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    disabled={isLoading}
+                  />
+                  <label
+                    htmlFor="images"
+                    className="border-2 border-dashed border-real-estate-gray/30 rounded-lg p-6 text-center block cursor-pointer hover:border-real-estate-gray/50 transition-colors"
+                  >
+                    {imagePreview ? (
+                      <div className="space-y-2">
+                        <img
+                          src={imagePreview}
+                          alt="Property preview"
+                          className="mx-auto h-32 w-32 object-cover rounded-lg"
+                        />
+                        <p className="text-sm text-real-estate-gray">
+                          Click to change image
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="h-8 w-8 text-real-estate-gray mx-auto mb-2" />
+                        <p className="text-real-estate-gray">
+                          Click to upload images or drag and drop
+                        </p>
+                        <p className="text-sm text-real-estate-gray/80 mt-1">
+                          PNG, JPG, GIF up to 10MB
+                        </p>
+                      </>
+                    )}
+                  </label>
                 </div>
               </div>
               
