@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Search, Filter, MapPin, Heart, Bed, Bath, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -25,6 +26,7 @@ const Browse = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -179,7 +181,9 @@ const Browse = () => {
                       </span>
                       <span className="text-real-estate-gray text-sm">/month</span>
                     </div>
-                    <Button size="sm">View Details</Button>
+                    <Button size="sm" onClick={() => navigate(`/property/${property.id}`)}>
+                      View Details
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
