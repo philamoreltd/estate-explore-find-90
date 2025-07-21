@@ -146,9 +146,14 @@ const Browse = () => {
                 </div>
                 
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-real-estate-navy mb-2 line-clamp-2">
-                    {property.title}
-                  </h3>
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="font-semibold text-real-estate-navy line-clamp-2 flex-1">
+                      {property.title}
+                    </h3>
+                    <span className="px-2 py-1 text-xs font-medium bg-real-estate-blue/10 text-real-estate-blue rounded-full ml-2 whitespace-nowrap">
+                      {property.property_type}
+                    </span>
+                  </div>
                   
                   <div className="flex items-center gap-1 text-real-estate-gray mb-3">
                     <MapPin className="h-4 w-4" />
