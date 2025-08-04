@@ -6,6 +6,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Navigation from "@/components/Navigation";
+import ContactModal from "@/components/ContactModal";
+import ScheduleViewingModal from "@/components/ScheduleViewingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -30,6 +32,8 @@ const PropertyDetails = () => {
   const navigate = useNavigate();
   const [property, setProperty] = useState<Property | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -239,23 +243,42 @@ const PropertyDetails = () => {
                   <div className="text-3xl font-bold text-real-estate-blue mb-1">
                     {formatPrice(property.rent_amount)}
                   </div>
-                  <div className="text-real-estate-gray">per month</div>
+                  <div className="text-real-estate-gray">
+                    {property.property_type.toLowerCase() === 'lodging' || property.property_type.toLowerCase() === 'bnb' 
+                      ? '/24hrs' 
+                      : '/month'
+                    }
+                  </div>
                 </div>
 
                 <Separator className="my-6" />
 
                 <div className="space-y-4">
-                  <Button className="w-full" size="lg">
+                  <Button 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => setShowContactModal(true)}
+                  >
                     <Phone className="h-4 w-4 mr-2" />
                     Contact Landlord
                   </Button>
                   
-                  <Button variant="outline" className="w-full" size="lg">
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => setShowScheduleModal(true)}
+                  >
                     <Calendar className="h-4 w-4 mr-2" />
                     Schedule Viewing
                   </Button>
                   
-                  <Button variant="outline" className="w-full" size="lg">
+                  <Button 
+                    variant="outline" 
+                    className="w-full" 
+                    size="lg"
+                    onClick={() => setShowContactModal(true)}
+                  >
                     <Mail className="h-4 w-4 mr-2" />
                     Send Message
                   </Button>
@@ -277,6 +300,24 @@ const PropertyDetails = () => {
           </div>
         </div>
       </div>
+
+      {/* Contact Modal */}
+      <ContactModal
+        isOpen={showContactModal}
+        onClose={() => setShowContactModal(false)}
+        propertyId={property.id}
+        propertyTitle={property.title}
+        landlordId={property.user_id}
+      />
+
+      {/* Schedule Viewing Modal */}
+      <ScheduleViewingModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        propertyId={property.id}
+        propertyTitle={property.title}
+        landlordId={property.user_id}
+      />
     </div>
   );
 };
