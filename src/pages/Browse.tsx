@@ -184,7 +184,12 @@ const Browse = () => {
                       <span className="text-2xl font-bold text-real-estate-blue">
                         {formatPrice(property.rent_amount)}
                       </span>
-                      <span className="text-real-estate-gray text-sm">/month</span>
+                      <span className="text-real-estate-gray text-sm">
+                        {property.property_type.toLowerCase() === 'lodging' || property.property_type.toLowerCase() === 'bnb' 
+                          ? '/day' 
+                          : '/month'
+                        }
+                      </span>
                     </div>
                     <Button size="sm" onClick={() => navigate(`/property/${property.id}`)}>
                       View Details
