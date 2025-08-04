@@ -186,7 +186,7 @@ const Browse = () => {
                       </span>
                       <span className="text-real-estate-gray text-sm">
                         {property.property_type.toLowerCase() === 'lodging' || property.property_type.toLowerCase() === 'bnb' 
-                          ? '/day' 
+                          ? '/24hrs' 
                           : '/month'
                         }
                       </span>
