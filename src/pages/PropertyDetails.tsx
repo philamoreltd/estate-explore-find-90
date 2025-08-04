@@ -10,6 +10,7 @@ import ContactModal from "@/components/ContactModal";
 import ScheduleViewingModal from "@/components/ScheduleViewingModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Property {
   id: string;
@@ -27,14 +28,22 @@ interface Property {
   user_id: string;
 }
 
+interface LandlordProfile {
+  full_name: string | null;
+  phone: string | null;
+  email: string | null;
+}
+
 const PropertyDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [property, setProperty] = useState<Property | null>(null);
+  const [landlordProfile, setLandlordProfile] = useState<LandlordProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (id) {
@@ -62,6 +71,11 @@ const PropertyDetails = () => {
       }
 
       setProperty(data);
+      
+      // Fetch landlord profile information
+      if (data.user_id) {
+        await fetchLandlordProfile(data.user_id);
+      }
     } catch (error) {
       console.error('Error fetching property:', error);
       toast({
@@ -73,6 +87,36 @@ const PropertyDetails = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchLandlordProfile = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name, phone, email')
+        .eq('user_id', userId)
+        .single();
+
+      if (error) {
+        console.error('Error fetching landlord profile:', error);
+        return;
+      }
+
+      setLandlordProfile(data);
+    } catch (error) {
+      console.error('Error fetching landlord profile:', error);
+    }
+  };
+
+  const maskPhoneNumber = (phone: string | null) => {
+    if (!phone) return "Not provided";
+    if (user) return phone; // Show full number if authenticated
+    
+    // Mask last 3 digits for unauthenticated users
+    if (phone.length >= 3) {
+      return phone.slice(0, -3) + 'XXX';
+    }
+    return 'XXX';
   };
 
   const formatPrice = (amount: number) => {
@@ -289,8 +333,19 @@ const PropertyDetails = () => {
                 <div className="text-center">
                   <div className="flex items-center justify-center gap-2 text-real-estate-gray mb-2">
                     <User className="h-4 w-4" />
-                    <span className="text-sm">Listed by landlord</span>
+                    <span className="text-sm">Listed by {landlordProfile?.full_name || 'Landlord'}</span>
                   </div>
+                  
+                  {landlordProfile?.phone && (
+                    <div className="flex items-center justify-center gap-2 text-real-estate-gray mb-2">
+                      <Phone className="h-4 w-4" />
+                      <span className="text-sm">{maskPhoneNumber(landlordProfile.phone)}</span>
+                      {!user && (
+                        <span className="text-xs text-real-estate-blue ml-1">(Sign in to view full number)</span>
+                      )}
+                    </div>
+                  )}
+                  
                   <p className="text-xs text-real-estate-gray">
                     Property ID: {property.id.substring(0, 8)}
                   </p>
