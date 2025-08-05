@@ -298,14 +298,40 @@ const PropertyDetails = () => {
                 <Separator className="my-6" />
 
                 <div className="space-y-4">
-                  <Button 
-                    className="w-full" 
-                    size="lg"
-                    onClick={() => setShowContactModal(true)}
-                  >
-                    <Phone className="h-4 w-4 mr-2" />
-                    Contact Landlord
-                  </Button>
+                  {landlordProfile?.phone ? (
+                    user ? (
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={() => window.open(`tel:${landlordProfile.phone}`, '_self')}
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call {landlordProfile.phone}
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={() => toast({
+                          title: "Sign in required",
+                          description: "Please sign in to view the full phone number and make a call.",
+                          variant: "destructive",
+                        })}
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call {maskPhoneNumber(landlordProfile.phone)}
+                      </Button>
+                    )
+                  ) : (
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      disabled
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Phone not available
+                    </Button>
+                  )}
                   
                   <Button 
                     variant="outline" 
