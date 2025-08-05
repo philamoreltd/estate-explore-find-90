@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, MapPin, Heart, Bed, Bath, Square } from "lucide-react";
+import { Search, Filter, MapPin, Heart, Bed, Bath, Square, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +30,14 @@ const Browse = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    propertyType: "",
+    bedrooms: "",
+    bathrooms: "",
+    priceRange: [0, 200000] as [number, number],
+    location: "",
+  });
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -59,11 +71,50 @@ const Browse = () => {
     }
   };
 
-  const filteredProperties = properties.filter(property =>
-    property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    property.property_type.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProperties = properties.filter(property => {
+    // Search term filter
+    const matchesSearchTerm = 
+      property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      property.property_type.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Property type filter
+    const matchesPropertyType = !filters.propertyType || 
+      property.property_type.toLowerCase() === filters.propertyType.toLowerCase();
+
+    // Bedrooms filter
+    const matchesBedrooms = !filters.bedrooms || 
+      property.bedrooms.toString() === filters.bedrooms;
+
+    // Bathrooms filter
+    const matchesBathrooms = !filters.bathrooms || 
+      property.bathrooms.toString() === filters.bathrooms;
+
+    // Price range filter (for monthly properties only)
+    const matchesPriceRange = 
+      (property.property_type.toLowerCase() === 'lodging' || property.property_type.toLowerCase() === 'bnb') ||
+      (property.rent_amount >= filters.priceRange[0] && property.rent_amount <= filters.priceRange[1]);
+
+    // Location filter
+    const matchesLocation = !filters.location || 
+      property.location.toLowerCase().includes(filters.location.toLowerCase());
+
+    return matchesSearchTerm && matchesPropertyType && matchesBedrooms && 
+           matchesBathrooms && matchesPriceRange && matchesLocation;
+  });
+
+  const clearFilters = () => {
+    setFilters({
+      propertyType: "",
+      bedrooms: "",
+      bathrooms: "",
+      priceRange: [0, 200000],
+      location: "",
+    });
+  };
+
+  const hasActiveFilters = filters.propertyType || filters.bedrooms || filters.bathrooms || 
+    filters.priceRange[0] > 0 || filters.priceRange[1] < 200000 || filters.location;
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {
@@ -99,11 +150,127 @@ const Browse = () => {
                 className="pl-10"
               />
             </div>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={() => setShowFilters(!showFilters)}
+            >
               <Filter className="h-4 w-4" />
               Filters
+              {hasActiveFilters && (
+                <Badge variant="secondary" className="ml-1">
+                  Active
+                </Badge>
+              )}
             </Button>
           </div>
+
+          {/* Filters Panel */}
+          {showFilters && (
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-real-estate-navy">Filters</h3>
+                <div className="flex gap-2">
+                  {hasActiveFilters && (
+                    <Button variant="ghost" size="sm" onClick={clearFilters}>
+                      <X className="h-4 w-4 mr-1" />
+                      Clear all
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="sm" onClick={() => setShowFilters(false)}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {/* Property Type */}
+                <div className="space-y-2">
+                  <Label htmlFor="property-type">Property Type</Label>
+                  <Select value={filters.propertyType} onValueChange={(value) => setFilters({...filters, propertyType: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any type</SelectItem>
+                      <SelectItem value="apartment">Apartment</SelectItem>
+                      <SelectItem value="house">House</SelectItem>
+                      <SelectItem value="studio">Studio</SelectItem>
+                      <SelectItem value="lodging">Lodging</SelectItem>
+                      <SelectItem value="bnb">BnB</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Bedrooms */}
+                <div className="space-y-2">
+                  <Label htmlFor="bedrooms">Bedrooms</Label>
+                  <Select value={filters.bedrooms} onValueChange={(value) => setFilters({...filters, bedrooms: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4</SelectItem>
+                      <SelectItem value="5">5+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Bathrooms */}
+                <div className="space-y-2">
+                  <Label htmlFor="bathrooms">Bathrooms</Label>
+                  <Select value={filters.bathrooms} onValueChange={(value) => setFilters({...filters, bathrooms: value})}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Any" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="1">1</SelectItem>
+                      <SelectItem value="2">2</SelectItem>
+                      <SelectItem value="3">3</SelectItem>
+                      <SelectItem value="4">4+</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Location */}
+                <div className="space-y-2">
+                  <Label htmlFor="location">Location</Label>
+                  <Input
+                    placeholder="Enter location"
+                    value={filters.location}
+                    onChange={(e) => setFilters({...filters, location: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              {/* Monthly Rent Range */}
+              <div className="mt-6 space-y-4">
+                <Label>Monthly Rent Range (KES)</Label>
+                <div className="px-3">
+                  <Slider
+                    min={0}
+                    max={200000}
+                    step={5000}
+                    value={filters.priceRange}
+                    onValueChange={(value) => setFilters({...filters, priceRange: value as [number, number]})}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-real-estate-gray mt-2">
+                    <span>{formatPrice(filters.priceRange[0])}</span>
+                    <span>{formatPrice(filters.priceRange[1])}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-real-estate-gray">
+                  * Price filter applies to monthly rentals only (excludes lodging and BnB properties)
+                </p>
+              </div>
+            </Card>
+          )}
         </div>
 
         {/* Properties Grid */}
