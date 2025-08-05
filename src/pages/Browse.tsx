@@ -32,9 +32,9 @@ const Browse = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    propertyType: "",
-    bedrooms: "",
-    bathrooms: "",
+    propertyType: "all",
+    bedrooms: "all",
+    bathrooms: "all",
     priceRange: [0, 200000] as [number, number],
     location: "",
   });
@@ -79,15 +79,15 @@ const Browse = () => {
       property.property_type.toLowerCase().includes(searchTerm.toLowerCase());
 
     // Property type filter
-    const matchesPropertyType = !filters.propertyType || 
+    const matchesPropertyType = filters.propertyType === "all" || 
       property.property_type.toLowerCase() === filters.propertyType.toLowerCase();
 
     // Bedrooms filter
-    const matchesBedrooms = !filters.bedrooms || 
+    const matchesBedrooms = filters.bedrooms === "all" || 
       property.bedrooms.toString() === filters.bedrooms;
 
     // Bathrooms filter
-    const matchesBathrooms = !filters.bathrooms || 
+    const matchesBathrooms = filters.bathrooms === "all" || 
       property.bathrooms.toString() === filters.bathrooms;
 
     // Price range filter (for monthly properties only)
@@ -105,15 +105,15 @@ const Browse = () => {
 
   const clearFilters = () => {
     setFilters({
-      propertyType: "",
-      bedrooms: "",
-      bathrooms: "",
+      propertyType: "all",
+      bedrooms: "all",
+      bathrooms: "all",
       priceRange: [0, 200000],
       location: "",
     });
   };
 
-  const hasActiveFilters = filters.propertyType || filters.bedrooms || filters.bathrooms || 
+  const hasActiveFilters = filters.propertyType !== "all" || filters.bedrooms !== "all" || filters.bathrooms !== "all" || 
     filters.priceRange[0] > 0 || filters.priceRange[1] < 200000 || filters.location;
 
   const formatPrice = (amount: number) => {
@@ -192,7 +192,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any type</SelectItem>
+                      <SelectItem value="all">Any type</SelectItem>
                       <SelectItem value="apartment">Apartment</SelectItem>
                       <SelectItem value="house">House</SelectItem>
                       <SelectItem value="studio">Studio</SelectItem>
@@ -210,7 +210,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="all">Any</SelectItem>
                       <SelectItem value="1">1</SelectItem>
                       <SelectItem value="2">2</SelectItem>
                       <SelectItem value="3">3</SelectItem>
@@ -228,7 +228,7 @@ const Browse = () => {
                       <SelectValue placeholder="Any" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">Any</SelectItem>
+                      <SelectItem value="all">Any</SelectItem>
                       <SelectItem value="1">1</SelectItem>
                       <SelectItem value="2">2</SelectItem>
                       <SelectItem value="3">3</SelectItem>
