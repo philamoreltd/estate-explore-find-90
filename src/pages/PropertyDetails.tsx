@@ -312,14 +312,10 @@ const PropertyDetails = () => {
                       <Button 
                         className="w-full" 
                         size="lg"
-                        onClick={() => toast({
-                          title: "Sign in required",
-                          description: "Please sign in to view the full phone number and make a call.",
-                          variant: "destructive",
-                        })}
+                        onClick={() => navigate('/auth')}
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Call {maskPhoneNumber(landlordProfile.phone)}
+                        Sign in to view phone number
                       </Button>
                     )
                   ) : (
