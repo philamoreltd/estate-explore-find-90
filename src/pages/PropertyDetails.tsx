@@ -99,9 +99,36 @@ const PropertyDetails = () => {
 
       if (error) {
         console.error('Error fetching landlord profile:', error);
+        // If no profile exists, try to get basic info from the property owner
+        try {
+          const { data: userData, error: userError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .maybeSingle();
+          
+          if (userData) {
+            setLandlordProfile(userData);
+          } else {
+            // Set a default profile with no phone
+            setLandlordProfile({
+              full_name: 'Property Owner',
+              phone: null,
+              email: null
+            });
+          }
+        } catch (fallbackError) {
+          console.error('Fallback profile fetch failed:', fallbackError);
+          setLandlordProfile({
+            full_name: 'Property Owner',
+            phone: null,
+            email: null
+          });
+        }
         return;
       }
 
+      console.log('Landlord profile data:', data);
       setLandlordProfile(data);
     } catch (error) {
       console.error('Error fetching landlord profile:', error);
