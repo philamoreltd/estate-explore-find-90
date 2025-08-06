@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PropertyCard from "./PropertyCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -7,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 
 interface Property {
   id: string;
+  user_id: string;
   title: string;
   rent_amount: number;
   location: string;
@@ -20,6 +22,7 @@ interface Property {
 }
 
 const FeaturedProperties = () => {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -155,6 +158,7 @@ const FeaturedProperties = () => {
           {properties.slice(0, 3).map((property) => (
             <PropertyCard
               key={property.id}
+              id={property.id}
               image={getPropertyImage(property)}
               price={formatPrice(property.rent_amount)}
               address={property.title}
@@ -164,13 +168,18 @@ const FeaturedProperties = () => {
               sqft={property.size_sqft || 1000}
               type="For Rent"
               isNew={isNewProperty(property.created_at)}
+              landlordId={property.user_id}
             />
           ))}
         </div>
 
         {/* View All Button */}
         <div className="text-center">
-          <Button variant="hero" size="lg">
+          <Button 
+            variant="hero" 
+            size="lg"
+            onClick={() => navigate('/browse')}
+          >
             View All Rentals
             <ArrowRight className="h-5 w-5 ml-2" />
           </Button>
