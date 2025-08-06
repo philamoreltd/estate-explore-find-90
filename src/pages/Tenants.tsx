@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MapPin, Home, DollarSign, Users, Upload, AlertCircle } from "lucide-react";
+import { MapPin, Home, DollarSign, Users, Upload, AlertCircle, X } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,8 +25,8 @@ const Tenants = () => {
     description: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -44,41 +44,61 @@ const Tenants = () => {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setSelectedImage(file);
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      const newFiles = [...selectedImages, ...files].slice(0, 5); // Max 5 images
+      setSelectedImages(newFiles);
+      
+      // Create previews for new files
+      const newPreviews: string[] = [];
+      files.forEach((file, index) => {
+        if (selectedImages.length + index < 5) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            newPreviews.push(reader.result as string);
+            if (newPreviews.length === Math.min(files.length, 5 - selectedImages.length)) {
+              setImagePreviews(prev => [...prev, ...newPreviews]);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
     }
   };
 
-  const uploadImage = async (file: File, propertyId: string): Promise<string | null> => {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}/${propertyId}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('property-images')
-        .upload(fileName, file);
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
+  const uploadImages = async (files: File[], propertyId: string): Promise<string[]> => {
+    const uploadPromises = files.map(async (file, index) => {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${user?.id}/${propertyId}_${index}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('property-images')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          return null;
+        }
+
+        const { data } = supabase.storage
+          .from('property-images')
+          .getPublicUrl(fileName);
+
+        return data.publicUrl;
+      } catch (error) {
+        console.error('Error uploading image:', error);
         return null;
       }
+    });
 
-      const { data } = supabase.storage
-        .from('property-images')
-        .getPublicUrl(fileName);
-
-      return data.publicUrl;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      return null;
-    }
+    const results = await Promise.all(uploadPromises);
+    return results.filter((url): url is string => url !== null);
   };
 
   const validateForm = () => {
@@ -150,20 +170,22 @@ const Tenants = () => {
         return;
       }
 
-      // Upload image if selected
-      let imageUrl = null;
-      if (selectedImage && property) {
-        imageUrl = await uploadImage(selectedImage, property.id);
+      // Upload images if selected
+      if (selectedImages.length > 0 && property) {
+        const imageUrls = await uploadImages(selectedImages, property.id);
         
-        if (imageUrl) {
-          // Update property with image URL
+        if (imageUrls.length > 0) {
+          // Update property with image URLs
           const { error: updateError } = await supabase
             .from('properties')
-            .update({ image_url: imageUrl })
+            .update({ 
+              image_urls: imageUrls,
+              image_url: imageUrls[0] // Keep first image as primary for backward compatibility
+            })
             .eq('id', property.id);
 
           if (updateError) {
-            console.error('Error updating property with image:', updateError);
+            console.error('Error updating property with images:', updateError);
           }
         }
       }
@@ -184,8 +206,8 @@ const Tenants = () => {
         size_sqft: "",
         description: "",
       });
-      setSelectedImage(null);
-      setImagePreview(null);
+      setSelectedImages([]);
+      setImagePreviews([]);
       
     } catch (error) {
       console.error('Error creating property:', error);
@@ -381,36 +403,57 @@ const Tenants = () => {
                     type="file"
                     id="images"
                     accept="image/*"
+                    multiple
                     onChange={handleImageChange}
                     className="hidden"
                     disabled={isLoading}
                   />
+                  
+                  {/* Image Previews */}
+                  {imagePreviews.length > 0 && (
+                    <div className="mb-4">
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        {imagePreviews.map((preview, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={preview}
+                              alt={`Property preview ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border border-real-estate-gray/20"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              disabled={isLoading}
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-2">
+                        {imagePreviews.length}/5 images selected
+                      </p>
+                    </div>
+                  )}
+                  
+                  {/* Upload Area */}
                   <label
                     htmlFor="images"
-                    className="border-2 border-dashed border-real-estate-gray/30 rounded-lg p-6 text-center block cursor-pointer hover:border-real-estate-gray/50 transition-colors"
+                    className={`border-2 border-dashed border-real-estate-gray/30 rounded-lg p-6 text-center block cursor-pointer hover:border-real-estate-gray/50 transition-colors ${
+                      selectedImages.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   >
-                    {imagePreview ? (
-                      <div className="space-y-2">
-                        <img
-                          src={imagePreview}
-                          alt="Property preview"
-                          className="mx-auto h-32 w-32 object-cover rounded-lg"
-                        />
-                        <p className="text-sm text-real-estate-gray">
-                          Click to change image
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <Upload className="h-8 w-8 text-real-estate-gray mx-auto mb-2" />
-                        <p className="text-real-estate-gray">
-                          Click to upload images or drag and drop
-                        </p>
-                        <p className="text-sm text-real-estate-gray/80 mt-1">
-                          PNG, JPG, GIF up to 10MB
-                        </p>
-                      </>
-                    )}
+                    <Upload className="h-8 w-8 text-real-estate-gray mx-auto mb-2" />
+                    <p className="text-real-estate-gray">
+                      {selectedImages.length >= 5 
+                        ? 'Maximum 5 images reached' 
+                        : 'Click to upload images or drag and drop'
+                      }
+                    </p>
+                    <p className="text-sm text-real-estate-gray/80 mt-1">
+                      PNG, JPG, GIF up to 10MB (Max 5 images)
+                    </p>
                   </label>
                 </div>
               </div>
