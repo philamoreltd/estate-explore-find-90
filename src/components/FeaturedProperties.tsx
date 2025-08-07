@@ -89,20 +89,20 @@ const FeaturedProperties = () => {
     }
 
     // Property type filter
-    if (propertyType) {
+    if (propertyType && propertyType !== "all") {
       filtered = filtered.filter(property =>
         property.property_type.toLowerCase() === propertyType.toLowerCase()
       );
     }
 
     // Rent filter
-    if (maxRent) {
+    if (maxRent && maxRent !== "all") {
       const maxRentNumber = parseInt(maxRent);
       filtered = filtered.filter(property => property.rent_amount <= maxRentNumber);
     }
 
     // Furnished status filter
-    if (furnishedStatus) {
+    if (furnishedStatus && furnishedStatus !== "all") {
       // This would need a furnished field in the database - for now, we'll filter by description
       if (furnishedStatus === "furnished") {
         filtered = filtered.filter(property =>
@@ -118,7 +118,7 @@ const FeaturedProperties = () => {
     }
 
     // Rental term filter
-    if (rentalTerm) {
+    if (rentalTerm && rentalTerm !== "all") {
       if (rentalTerm === "short-term") {
         filtered = filtered.filter(property =>
           property.property_type.toLowerCase().includes("bnb") ||
@@ -140,10 +140,10 @@ const FeaturedProperties = () => {
 
   const clearFilters = () => {
     setSearchTerm("");
-    setPropertyType("");
-    setMaxRent("");
-    setFurnishedStatus("");
-    setRentalTerm("");
+    setPropertyType("all");
+    setMaxRent("all");
+    setFurnishedStatus("all");
+    setRentalTerm("all");
   };
 
   const formatPrice = (amount: number) => {
@@ -261,7 +261,7 @@ const FeaturedProperties = () => {
                 <SelectValue placeholder="Property Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="all">All Types</SelectItem>
                 <SelectItem value="apartment">Apartment</SelectItem>
                 <SelectItem value="house">House</SelectItem>
                 <SelectItem value="studio">Studio</SelectItem>
@@ -277,7 +277,7 @@ const FeaturedProperties = () => {
                 <SelectValue placeholder="Max Rent" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Price</SelectItem>
+                <SelectItem value="all">Any Price</SelectItem>
                 <SelectItem value="50000">Up to Ksh 50K</SelectItem>
                 <SelectItem value="100000">Up to Ksh 100K</SelectItem>
                 <SelectItem value="150000">Up to Ksh 150K</SelectItem>
@@ -292,7 +292,7 @@ const FeaturedProperties = () => {
                 <SelectValue placeholder="Furnished" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any</SelectItem>
+                <SelectItem value="all">Any</SelectItem>
                 <SelectItem value="furnished">Furnished</SelectItem>
                 <SelectItem value="unfurnished">Unfurnished</SelectItem>
               </SelectContent>
@@ -304,7 +304,7 @@ const FeaturedProperties = () => {
                 <SelectValue placeholder="Rental Term" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Any Term</SelectItem>
+                <SelectItem value="all">Any Term</SelectItem>
                 <SelectItem value="short-term">Short Term</SelectItem>
                 <SelectItem value="long-term">Long Term</SelectItem>
               </SelectContent>
