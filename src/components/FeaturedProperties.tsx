@@ -278,10 +278,13 @@ const FeaturedProperties = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Any Price</SelectItem>
+                <SelectItem value="25000">Up to Ksh 25K</SelectItem>
                 <SelectItem value="50000">Up to Ksh 50K</SelectItem>
+                <SelectItem value="75000">Up to Ksh 75K</SelectItem>
                 <SelectItem value="100000">Up to Ksh 100K</SelectItem>
                 <SelectItem value="150000">Up to Ksh 150K</SelectItem>
                 <SelectItem value="200000">Up to Ksh 200K</SelectItem>
+                <SelectItem value="250000">Up to Ksh 250K</SelectItem>
                 <SelectItem value="300000">Up to Ksh 300K</SelectItem>
               </SelectContent>
             </Select>
