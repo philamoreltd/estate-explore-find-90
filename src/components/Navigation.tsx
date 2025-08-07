@@ -50,6 +50,9 @@ const Navigation = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
+              <a href="/" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
+                Home
+              </a>
               <a href="/browse" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Browse Rentals
               </a>
@@ -115,6 +118,12 @@ const Navigation = () => {
           <div className="md:hidden border-t border-real-estate-gray/10">
             <div className="px-2 pt-2 pb-3 space-y-1 bg-white">
               {/* Mobile Navigation Links */}
+              <button
+                onClick={() => handleMobileNavigation('/')}
+                className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
+              >
+                Home
+              </button>
               <button
                 onClick={() => handleMobileNavigation('/browse')}
                 className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
