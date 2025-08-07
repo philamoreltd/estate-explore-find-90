@@ -347,14 +347,26 @@ const PropertyDetails = () => {
                       </Button>
                     )
                   ) : (
-                    <Button 
-                      className="w-full" 
-                      size="lg"
-                      disabled
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      Phone not available
-                    </Button>
+                    user ? (
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        disabled
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Phone not provided by landlord
+                      </Button>
+                    ) : (
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        variant="outline"
+                        onClick={() => navigate('/auth')}
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Sign in to view contact details
+                      </Button>
+                    )
                   )}
                   
                   <Button 
