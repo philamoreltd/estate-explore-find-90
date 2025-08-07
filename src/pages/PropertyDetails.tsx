@@ -339,6 +339,7 @@ const PropertyDetails = () => {
                       <Button 
                         className="w-full" 
                         size="lg"
+                        variant="outline"
                         onClick={() => navigate('/auth')}
                       >
                         <Phone className="h-4 w-4 mr-2" />

@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropertyCard from "./PropertyCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowRight, Search, Filter } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -18,18 +20,29 @@ interface Property {
   property_type: string;
   image_url: string | null;
   image_urls: string[] | null;
+  description: string | null;
   created_at: string;
 }
 
 const FeaturedProperties = () => {
   const navigate = useNavigate();
   const [properties, setProperties] = useState<Property[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [maxRent, setMaxRent] = useState("");
+  const [furnishedStatus, setFurnishedStatus] = useState("");
+  const [rentalTerm, setRentalTerm] = useState("");
   const { toast } = useToast();
 
   useEffect(() => {
     fetchFeaturedProperties();
   }, []);
+
+  useEffect(() => {
+    filterProperties();
+  }, [properties, searchTerm, propertyType, maxRent, furnishedStatus, rentalTerm]);
 
   const fetchFeaturedProperties = async () => {
     try {
@@ -51,6 +64,7 @@ const FeaturedProperties = () => {
       }
 
       setProperties(data || []);
+      setFilteredProperties(data || []);
     } catch (error) {
       console.error('Error fetching properties:', error);
       toast({
@@ -61,6 +75,75 @@ const FeaturedProperties = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterProperties = () => {
+    let filtered = properties;
+
+    // Search filter
+    if (searchTerm) {
+      filtered = filtered.filter(property =>
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Property type filter
+    if (propertyType) {
+      filtered = filtered.filter(property =>
+        property.property_type.toLowerCase() === propertyType.toLowerCase()
+      );
+    }
+
+    // Rent filter
+    if (maxRent) {
+      const maxRentNumber = parseInt(maxRent);
+      filtered = filtered.filter(property => property.rent_amount <= maxRentNumber);
+    }
+
+    // Furnished status filter
+    if (furnishedStatus) {
+      // This would need a furnished field in the database - for now, we'll filter by description
+      if (furnishedStatus === "furnished") {
+        filtered = filtered.filter(property =>
+          property.description?.toLowerCase().includes("furnished") ||
+          property.title.toLowerCase().includes("furnished")
+        );
+      } else if (furnishedStatus === "unfurnished") {
+        filtered = filtered.filter(property =>
+          !property.description?.toLowerCase().includes("furnished") &&
+          !property.title.toLowerCase().includes("furnished")
+        );
+      }
+    }
+
+    // Rental term filter
+    if (rentalTerm) {
+      if (rentalTerm === "short-term") {
+        filtered = filtered.filter(property =>
+          property.property_type.toLowerCase().includes("bnb") ||
+          property.property_type.toLowerCase().includes("lodging") ||
+          property.description?.toLowerCase().includes("short term") ||
+          property.description?.toLowerCase().includes("weekly") ||
+          property.description?.toLowerCase().includes("daily")
+        );
+      } else if (rentalTerm === "long-term") {
+        filtered = filtered.filter(property =>
+          !property.property_type.toLowerCase().includes("bnb") &&
+          !property.property_type.toLowerCase().includes("lodging")
+        );
+      }
+    }
+
+    setFilteredProperties(filtered);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setPropertyType("");
+    setMaxRent("");
+    setFurnishedStatus("");
+    setRentalTerm("");
   };
 
   const formatPrice = (amount: number) => {
@@ -144,7 +227,7 @@ const FeaturedProperties = () => {
     <section className="py-16 bg-gradient-subtle">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold text-real-estate-navy mb-4">
             Featured Rentals
           </h2>
@@ -153,9 +236,94 @@ const FeaturedProperties = () => {
           </p>
         </div>
 
+        {/* Filters */}
+        <div className="bg-white rounded-xl shadow-card p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="h-5 w-5 text-real-estate-blue" />
+            <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
+              <Input
+                placeholder="Search location or title..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Property Type */}
+            <Select value={propertyType} onValueChange={setPropertyType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Property Type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Types</SelectItem>
+                <SelectItem value="apartment">Apartment</SelectItem>
+                <SelectItem value="house">House</SelectItem>
+                <SelectItem value="studio">Studio</SelectItem>
+                <SelectItem value="condo">Condo</SelectItem>
+                <SelectItem value="bnb">BnB</SelectItem>
+                <SelectItem value="lodging">Lodging</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Monthly Rent */}
+            <Select value={maxRent} onValueChange={setMaxRent}>
+              <SelectTrigger>
+                <SelectValue placeholder="Max Rent" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Any Price</SelectItem>
+                <SelectItem value="50000">Up to Ksh 50K</SelectItem>
+                <SelectItem value="100000">Up to Ksh 100K</SelectItem>
+                <SelectItem value="150000">Up to Ksh 150K</SelectItem>
+                <SelectItem value="200000">Up to Ksh 200K</SelectItem>
+                <SelectItem value="300000">Up to Ksh 300K</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Furnished Status */}
+            <Select value={furnishedStatus} onValueChange={setFurnishedStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Furnished" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Any</SelectItem>
+                <SelectItem value="furnished">Furnished</SelectItem>
+                <SelectItem value="unfurnished">Unfurnished</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Rental Term */}
+            <Select value={rentalTerm} onValueChange={setRentalTerm}>
+              <SelectTrigger>
+                <SelectValue placeholder="Rental Term" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Any Term</SelectItem>
+                <SelectItem value="short-term">Short Term</SelectItem>
+                <SelectItem value="long-term">Long Term</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            <Button 
+              variant="outline" 
+              onClick={clearFilters}
+              className="w-full"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
+
         {/* Properties Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {properties.slice(0, 3).map((property) => (
+          {filteredProperties.slice(0, 6).map((property) => (
             <PropertyCard
               key={property.id}
               id={property.id}
