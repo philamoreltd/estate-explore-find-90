@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MapPin, Home, DollarSign, Users, Upload, AlertCircle, X } from "lucide-react";
+import LocationPicker from "@/components/LocationPicker";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,6 +24,8 @@ const Tenants = () => {
     bathrooms: "",
     size_sqft: "",
     description: "",
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
@@ -41,6 +44,15 @@ const Tenants = () => {
         [name]: ""
       }));
     }
+  };
+
+  const handleLocationSelect = (latitude: number, longitude: number, address?: string) => {
+    setFormData(prev => ({
+      ...prev,
+      latitude,
+      longitude,
+      location: address || prev.location
+    }));
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,6 +163,8 @@ const Tenants = () => {
         bathrooms: Number(formData.bathrooms),
         size_sqft: formData.size_sqft ? Number(formData.size_sqft) : null,
         description: formData.description || null,
+        latitude: formData.latitude,
+        longitude: formData.longitude,
         status: 'available'
       };
 
@@ -205,6 +219,8 @@ const Tenants = () => {
         bathrooms: "",
         size_sqft: "",
         description: "",
+        latitude: null,
+        longitude: null,
       });
       setSelectedImages([]);
       setImagePreviews([]);
@@ -395,6 +411,13 @@ const Tenants = () => {
                   disabled={isLoading}
                 />
               </div>
+              
+              {/* Location Picker */}
+              <LocationPicker
+                onLocationSelect={handleLocationSelect}
+                initialLatitude={formData.latitude || undefined}
+                initialLongitude={formData.longitude || undefined}
+              />
               
               <div>
                 <Label htmlFor="images">Property Images</Label>
