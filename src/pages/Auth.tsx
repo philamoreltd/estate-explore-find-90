@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Home, Mail, Lock, User, AlertCircle, Phone } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Home, Mail, Lock, User, AlertCircle, Phone, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,7 +19,8 @@ const Auth = () => {
     password: "",
     fullName: "",
     phone: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: ""
   });
   const [signInData, setSignInData] = useState({
     email: "",
@@ -53,6 +55,10 @@ const Auth = () => {
       newErrors.phone = "Phone number is required";
     } else if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(signUpData.phone)) {
       newErrors.phone = "Please enter a valid phone number";
+    }
+
+    if (!signUpData.role) {
+      newErrors.role = "Please select your account type";
     }
     
     if (!signUpData.password) {
@@ -103,6 +109,7 @@ const Auth = () => {
           data: {
             full_name: signUpData.fullName,
             phone: signUpData.phone,
+            role: signUpData.role,
           }
         }
       });
@@ -127,7 +134,8 @@ const Auth = () => {
         password: "",
         fullName: "",
         phone: "",
-        confirmPassword: ""
+        confirmPassword: "",
+        role: ""
       });
       
     } catch (error: any) {
@@ -316,6 +324,45 @@ const Auth = () => {
                   </div>
                   {errors.phone && (
                     <p className="text-sm text-destructive">{errors.phone}</p>
+                  )}
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="signup-role">Account Type</Label>
+                  <Select 
+                    value={signUpData.role} 
+                    onValueChange={(value) => setSignUpData({ ...signUpData, role: value })}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <SelectValue placeholder="Choose your account type" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tenant">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium">Tenant</div>
+                            <div className="text-sm text-muted-foreground">Looking for rental properties</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="landlord">
+                        <div className="flex items-center gap-2">
+                          <Home className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium">Landlord</div>
+                            <div className="text-sm text-muted-foreground">Listing rental properties</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.role && (
+                    <p className="text-sm text-destructive">{errors.role}</p>
                   )}
                 </div>
                 
