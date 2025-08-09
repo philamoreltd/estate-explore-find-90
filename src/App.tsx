@@ -10,6 +10,8 @@ import Tenants from "./pages/Tenants";
 import Landlords from "./pages/Landlords";
 import Browse from "./pages/Browse";
 import PropertyDetails from "./pages/PropertyDetails";
+import AddProperty from "./pages/AddProperty";
+import EditProperty from "./pages/EditProperty";
 import AdminDashboard from "./pages/AdminDashboard";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -30,6 +32,16 @@ const App = () => (
             <Route path="/landlords" element={
               <ProtectedRoute>
                 <Landlords />
+              </ProtectedRoute>
+            } />
+            <Route path="/add-property" element={
+              <ProtectedRoute>
+                <AddProperty />
+              </ProtectedRoute>
+            } />
+            <Route path="/edit-property/:id" element={
+              <ProtectedRoute>
+                <EditProperty />
               </ProtectedRoute>
             } />
             <Route path="/tenants" element={

@@ -126,7 +126,7 @@ const Landlords = () => {
               Manage your rental property listings
             </p>
           </div>
-          <Button onClick={() => navigate('/tenants')} className="flex items-center gap-2">
+          <Button onClick={() => navigate('/add-property')} className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Add New Property
           </Button>
@@ -219,7 +219,7 @@ const Landlords = () => {
               <p className="text-real-estate-gray mb-6">
                 Start by adding your first rental property to attract potential tenants.
               </p>
-              <Button onClick={() => navigate('/tenants')}>
+              <Button onClick={() => navigate('/add-property')}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Your First Property
               </Button>
@@ -274,11 +274,21 @@ const Landlords = () => {
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => navigate(`/property/${property.id}`)}
+                    >
                       <Eye className="h-4 w-4 mr-1" />
                       View
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => navigate(`/edit-property/${property.id}`)}
+                    >
                       <Edit className="h-4 w-4 mr-1" />
                       Edit
                     </Button>
