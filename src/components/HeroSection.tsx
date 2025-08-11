@@ -2,8 +2,50 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin } from "lucide-react";
 import heroImage from "@/assets/hero-house.jpg";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  onSearch?: (filters: {
+    location: string;
+    propertyType: string;
+    furnished?: string;
+    rentalTerm?: string;
+  }) => void;
+}
+
+const HeroSection = ({ onSearch }: HeroSectionProps) => {
+  const [location, setLocation] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [activeFilter, setActiveFilter] = useState<string>("");
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    const filters = {
+      location,
+      propertyType,
+      furnished: activeFilter === "furnished" ? "true" : activeFilter === "unfurnished" ? "false" : undefined,
+      rentalTerm: activeFilter === "short-term" ? "short-term" : activeFilter === "monthly" ? "monthly" : undefined,
+    };
+    
+    if (onSearch) {
+      onSearch(filters);
+    } else {
+      // Navigate to browse page with search params
+      const searchParams = new URLSearchParams();
+      if (location) searchParams.set('location', location);
+      if (propertyType) searchParams.set('propertyType', propertyType);
+      if (filters.furnished !== undefined) searchParams.set('furnished', filters.furnished);
+      if (filters.rentalTerm) searchParams.set('rentalTerm', filters.rentalTerm);
+      
+      navigate(`/browse?${searchParams.toString()}`);
+    }
+  };
+
+  const handleFilterClick = (filter: string) => {
+    setActiveFilter(activeFilter === filter ? "" : filter);
+  };
+
   return (
     <section className="relative h-[600px] bg-gradient-hero overflow-hidden">
       {/* Background Image */}
@@ -33,25 +75,31 @@ const HeroSection = () => {
                   <Input 
                     placeholder="Enter city, neighborhood, or ZIP code"
                     className="pl-10 h-12 text-base border-real-estate-gray/20 focus:border-real-estate-blue"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                   />
                 </div>
               </div>
               
-              <select className="h-12 px-4 rounded-md border border-real-estate-gray/20 focus:border-real-estate-blue outline-none">
-                <option>Property Type</option>
-                <option>Bedsitters</option>
-                <option>Single Rooms</option>
-                <option>One Bedrooms</option>
-                <option>Two Bedrooms</option>
-                <option>Three Bedrooms</option>
-                <option>Apartments</option>
-                <option>Business Rooms</option>
-                <option>Offices</option>
-                <option>Lodgings</option>
-                <option>BNB</option>
+              <select 
+                className="h-12 px-4 rounded-md border border-real-estate-gray/20 focus:border-real-estate-blue outline-none"
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
+              >
+                <option value="">Property Type</option>
+                <option value="bedsitter">Bedsitters</option>
+                <option value="single-room">Single Rooms</option>
+                <option value="one-bedroom">One Bedrooms</option>
+                <option value="two-bedroom">Two Bedrooms</option>
+                <option value="three-bedroom">Three Bedrooms</option>
+                <option value="apartment">Apartments</option>
+                <option value="business-room">Business Rooms</option>
+                <option value="office">Offices</option>
+                <option value="lodging">Lodgings</option>
+                <option value="bnb">BNB</option>
               </select>
               
-              <Button variant="search" size="lg" className="h-12">
+              <Button variant="search" size="lg" className="h-12" onClick={handleSearch}>
                 <Search className="h-5 w-5 mr-2" />
                 Search
               </Button>
@@ -59,10 +107,34 @@ const HeroSection = () => {
             
             {/* Quick Filters */}
             <div className="flex flex-wrap gap-3 mt-6 justify-center">
-              <Button variant="property" size="sm">Monthly Rent</Button>
-              <Button variant="property" size="sm">Furnished</Button>
-              <Button variant="property" size="sm">Unfurnished</Button>
-              <Button variant="property" size="sm">Short Term</Button>
+              <Button 
+                variant={activeFilter === "monthly" ? "search" : "property"} 
+                size="sm"
+                onClick={() => handleFilterClick("monthly")}
+              >
+                Monthly Rent
+              </Button>
+              <Button 
+                variant={activeFilter === "furnished" ? "search" : "property"} 
+                size="sm"
+                onClick={() => handleFilterClick("furnished")}
+              >
+                Furnished
+              </Button>
+              <Button 
+                variant={activeFilter === "unfurnished" ? "search" : "property"} 
+                size="sm"
+                onClick={() => handleFilterClick("unfurnished")}
+              >
+                Unfurnished
+              </Button>
+              <Button 
+                variant={activeFilter === "short-term" ? "search" : "property"} 
+                size="sm"
+                onClick={() => handleFilterClick("short-term")}
+              >
+                Short Term
+              </Button>
             </div>
           </div>
         </div>
