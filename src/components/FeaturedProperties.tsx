@@ -4,9 +4,10 @@ import PropertyCard from "./PropertyCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowRight, Search, Filter } from "lucide-react";
+import { ArrowRight, Search, Filter, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getCurrentLocation, calculateDistance, formatDistance, type LocationData } from "@/utils/location";
 
 interface Property {
   id: string;
@@ -14,6 +15,8 @@ interface Property {
   title: string;
   rent_amount: number;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
   bedrooms: number;
   bathrooms: number;
   size_sqft: number | null;
@@ -22,6 +25,7 @@ interface Property {
   image_urls: string[] | null;
   description: string | null;
   created_at: string;
+  distance?: number;
 }
 
 const FeaturedProperties = () => {
@@ -34,6 +38,8 @@ const FeaturedProperties = () => {
   const [maxRent, setMaxRent] = useState("");
   const [furnishedStatus, setFurnishedStatus] = useState("");
   const [rentalTerm, setRentalTerm] = useState("");
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,8 +69,24 @@ const FeaturedProperties = () => {
         return;
       }
 
-      setProperties(data || []);
-      setFilteredProperties(data || []);
+      // Calculate distances if user location is available
+      let propertiesWithDistance = data || [];
+      if (userLocation) {
+        propertiesWithDistance = propertiesWithDistance.map(property => ({
+          ...property,
+          distance: property.latitude && property.longitude 
+            ? calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                property.latitude,
+                property.longitude
+              )
+            : undefined
+        }));
+      }
+
+      setProperties(propertiesWithDistance);
+      setFilteredProperties(propertiesWithDistance);
     } catch (error) {
       console.error('Error fetching properties:', error);
       toast({
@@ -74,6 +96,28 @@ const FeaturedProperties = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getUserLocation = async () => {
+    setLocationLoading(true);
+    try {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      toast({
+        title: "Location found",
+        description: "Properties will now show distance from your location",
+      });
+      // Refetch properties to calculate distances
+      await fetchFeaturedProperties();
+    } catch (error) {
+      toast({
+        title: "Location access failed",
+        description: error instanceof Error ? error.message : "Could not access your location",
+        variant: "destructive",
+      });
+    } finally {
+      setLocationLoading(false);
     }
   };
 
@@ -243,7 +287,7 @@ const FeaturedProperties = () => {
             <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
@@ -320,6 +364,19 @@ const FeaturedProperties = () => {
               className="w-full"
             >
               Clear Filters
+            </Button>
+          </div>
+
+          {/* Location Button */}
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={getUserLocation}
+              disabled={locationLoading}
+            >
+              <Target className="h-4 w-4" />
+              {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
             </Button>
           </div>
         </div>

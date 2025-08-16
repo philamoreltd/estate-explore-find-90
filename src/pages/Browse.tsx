@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, MapPin, Heart, Bed, Bath, Square, X } from "lucide-react";
+import { Search, Filter, MapPin, Heart, Bed, Bath, Square, X, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getCurrentLocation, calculateDistance, formatDistance, type LocationData } from "@/utils/location";
 
 interface Property {
   id: string;
@@ -18,12 +19,15 @@ interface Property {
   property_type: string;
   rent_amount: number;
   location: string;
+  latitude: number | null;
+  longitude: number | null;
   bedrooms: number;
   bathrooms: number;
   size_sqft: number | null;
   description: string | null;
   image_url: string | null;
   status: string;
+  distance?: number; // Calculated distance from user's location
 }
 
 const Browse = () => {
@@ -37,7 +41,10 @@ const Browse = () => {
     bathrooms: "all",
     priceRange: [0, 200000] as [number, number],
     location: "",
+    maxDistance: 50, // Maximum distance in kilometers
   });
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -63,11 +70,49 @@ const Browse = () => {
         return;
       }
 
-      setProperties(data || []);
+      // Calculate distances if user location is available
+      let propertiesWithDistance = data || [];
+      if (userLocation) {
+        propertiesWithDistance = propertiesWithDistance.map(property => ({
+          ...property,
+          distance: property.latitude && property.longitude 
+            ? calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                property.latitude,
+                property.longitude
+              )
+            : undefined
+        }));
+      }
+
+      setProperties(propertiesWithDistance);
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const getUserLocation = async () => {
+    setLocationLoading(true);
+    try {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      toast({
+        title: "Location found",
+        description: "Properties will now show distance from your location",
+      });
+      // Refetch properties to calculate distances
+      await fetchProperties();
+    } catch (error) {
+      toast({
+        title: "Location access failed",
+        description: error instanceof Error ? error.message : "Could not access your location",
+        variant: "destructive",
+      });
+    } finally {
+      setLocationLoading(false);
     }
   };
 
@@ -95,12 +140,16 @@ const Browse = () => {
       (property.property_type.toLowerCase() === 'lodging' || property.property_type.toLowerCase() === 'bnb') ||
       (property.rent_amount >= filters.priceRange[0] && property.rent_amount <= filters.priceRange[1]);
 
-    // Location filter
+    // Location filter (text-based)
     const matchesLocation = !filters.location || 
       property.location.toLowerCase().includes(filters.location.toLowerCase());
 
+    // Distance filter (if user location is available)
+    const matchesDistance = !userLocation || !property.distance || 
+      property.distance <= filters.maxDistance;
+
     return matchesSearchTerm && matchesPropertyType && matchesBedrooms && 
-           matchesBathrooms && matchesPriceRange && matchesLocation;
+           matchesBathrooms && matchesPriceRange && matchesLocation && matchesDistance;
   });
 
   const clearFilters = () => {
@@ -110,11 +159,12 @@ const Browse = () => {
       bathrooms: "all",
       priceRange: [0, 200000],
       location: "",
+      maxDistance: 50,
     });
   };
 
   const hasActiveFilters = filters.propertyType !== "all" || filters.bedrooms !== "all" || filters.bathrooms !== "all" || 
-    filters.priceRange[0] > 0 || filters.priceRange[1] < 200000 || filters.location;
+    filters.priceRange[0] > 0 || filters.priceRange[1] < 200000 || filters.location || filters.maxDistance < 50;
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {
@@ -153,6 +203,15 @@ const Browse = () => {
             <Button 
               variant="outline" 
               className="flex items-center gap-2"
+              onClick={getUserLocation}
+              disabled={locationLoading}
+            >
+              <Target className="h-4 w-4" />
+              {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
+            </Button>
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter className="h-4 w-4" />
@@ -183,7 +242,7 @@ const Browse = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 {/* Property Type */}
                 <div className="space-y-2">
                   <Label htmlFor="property-type">Property Type</Label>
@@ -239,13 +298,35 @@ const Browse = () => {
 
                 {/* Location */}
                 <div className="space-y-2">
-                  <Label htmlFor="location">Location</Label>
+                  <Label htmlFor="location">Location (Text Search)</Label>
                   <Input
                     placeholder="Enter location"
                     value={filters.location}
                     onChange={(e) => setFilters({...filters, location: e.target.value})}
                   />
                 </div>
+
+                {/* Distance Filter (only shown if location is available) */}
+                {userLocation && (
+                  <div className="space-y-2">
+                    <Label htmlFor="distance">Max Distance</Label>
+                    <Select 
+                      value={filters.maxDistance.toString()} 
+                      onValueChange={(value) => setFilters({...filters, maxDistance: parseInt(value)})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Any distance" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="5">Within 5km</SelectItem>
+                        <SelectItem value="10">Within 10km</SelectItem>
+                        <SelectItem value="20">Within 20km</SelectItem>
+                        <SelectItem value="50">Within 50km</SelectItem>
+                        <SelectItem value="100">Within 100km</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
 
               {/* Monthly Rent Range */}
@@ -325,6 +406,11 @@ const Browse = () => {
                   <div className="flex items-center gap-1 text-real-estate-gray mb-3">
                     <MapPin className="h-4 w-4" />
                     <span className="text-sm">{property.location}</span>
+                    {property.distance && (
+                      <span className="text-xs text-real-estate-blue ml-2">
+                        • {formatDistance(property.distance)}
+                      </span>
+                    )}
                   </div>
                   
                   <div className="flex items-center justify-between mb-4">
