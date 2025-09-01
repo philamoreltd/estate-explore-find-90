@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, User, Phone, Mail } from "lucide-react";
+import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, User, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,6 +23,7 @@ interface Property {
   size_sqft: number | null;
   description: string | null;
   image_url: string | null;
+  image_urls: string[] | null;
   status: string;
   created_at: string;
   user_id: string;
@@ -42,6 +43,7 @@ const PropertyDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -213,19 +215,85 @@ const PropertyDetails = () => {
           Back to Browse
         </Button>
 
-        {/* Property Image */}
-        <div className="aspect-video w-full mb-8 rounded-lg overflow-hidden">
-          {property.image_url ? (
-            <img
-              src={property.image_url}
-              alt={property.title}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-real-estate-gray/10 flex items-center justify-center">
-              <span className="text-real-estate-gray text-lg">No Image Available</span>
-            </div>
-          )}
+        {/* Property Images Carousel */}
+        <div className="aspect-video w-full mb-8 rounded-lg overflow-hidden relative group">
+          {(() => {
+            const images = property.image_urls && property.image_urls.length > 0 
+              ? property.image_urls 
+              : property.image_url 
+                ? [property.image_url] 
+                : [];
+            
+            if (images.length === 0) {
+              return (
+                <div className="w-full h-full bg-real-estate-gray/10 flex items-center justify-center">
+                  <span className="text-real-estate-gray text-lg">No Image Available</span>
+                </div>
+              );
+            }
+
+            const nextImage = () => {
+              setCurrentImageIndex((prev) => (prev + 1) % images.length);
+            };
+
+            const prevImage = () => {
+              setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length);
+            };
+
+            return (
+              <>
+                <img
+                  src={images[currentImageIndex]}
+                  alt={`${property.title} - Image ${currentImageIndex + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                
+                {images.length > 1 && (
+                  <>
+                    {/* Previous Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      onClick={prevImage}
+                    >
+                      <ChevronLeft className="h-6 w-6" />
+                    </Button>
+                    
+                    {/* Next Button */}
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      onClick={nextImage}
+                    >
+                      <ChevronRight className="h-6 w-6" />
+                    </Button>
+                    
+                    {/* Image Counter */}
+                    <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                      {currentImageIndex + 1} / {images.length}
+                    </div>
+                    
+                    {/* Dot Indicators */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                      {images.map((_, index) => (
+                        <button
+                          key={index}
+                          className={`w-3 h-3 rounded-full transition-colors ${
+                            index === currentImageIndex 
+                              ? 'bg-white' 
+                              : 'bg-white/50 hover:bg-white/75'
+                          }`}
+                          onClick={() => setCurrentImageIndex(index)}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </>
+            );
+          })()}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
