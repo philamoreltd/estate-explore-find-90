@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Heart, Bed, Bath, Square, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ScheduleViewingModal from "./ScheduleViewingModal";
@@ -8,6 +9,7 @@ import ScheduleViewingModal from "./ScheduleViewingModal";
 interface PropertyCardProps {
   id?: string;
   image: string;
+  imageUrls?: string[];
   price: string;
   address: string;
   city: string;
@@ -22,6 +24,7 @@ interface PropertyCardProps {
 const PropertyCard = ({ 
   id,
   image, 
+  imageUrls,
   price, 
   address, 
   city, 
@@ -48,19 +51,46 @@ const PropertyCard = ({
   return (
     <>
       <div className="bg-white rounded-xl shadow-card hover:shadow-hover transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
-        {/* Image */}
+        {/* Image Carousel */}
         <div className="relative overflow-hidden">
-          <img 
-            src={image} 
-            alt={address}
-            className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+          {imageUrls && imageUrls.length > 1 ? (
+            <Carousel className="w-full">
+              <CarouselContent>
+                {imageUrls.map((imageUrl, index) => (
+                  <CarouselItem key={index}>
+                    <img 
+                      src={imageUrl} 
+                      alt={`${address} - Image ${index + 1}`}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {imageUrls.length > 1 && (
+                <>
+                  <CarouselPrevious className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white" />
+                  <CarouselNext className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white" />
+                </>
+              )}
+            </Carousel>
+          ) : (
+            <img 
+              src={image} 
+              alt={address}
+              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          )}
           
           {/* Badges and Actions */}
           <div className="absolute top-3 left-3 right-3 flex justify-between items-start">
             <div className="flex gap-2">
               {isNew && <Badge className="bg-real-estate-green text-white">New</Badge>}
               <Badge className="bg-real-estate-blue text-white">{type}</Badge>
+              {imageUrls && imageUrls.length > 1 && (
+                <Badge className="bg-black/50 text-white">
+                  {imageUrls.length} photos
+                </Badge>
+              )}
             </div>
             <Button variant="ghost" size="icon" className="bg-white/80 hover:bg-white">
               <Heart className="h-4 w-4 text-real-estate-gray hover:text-red-500 transition-colors" />

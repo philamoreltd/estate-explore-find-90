@@ -388,6 +388,7 @@ const FeaturedProperties = () => {
               key={property.id}
               id={property.id}
               image={getPropertyImage(property)}
+              imageUrls={property.image_urls || []}
               price={formatPrice(property.rent_amount)}
               address={property.title}
               city={property.location}

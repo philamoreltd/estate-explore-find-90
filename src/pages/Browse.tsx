@@ -12,6 +12,7 @@ import Navigation from "@/components/Navigation";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentLocation, calculateDistance, formatDistance, type LocationData } from "@/utils/location";
+import PropertyCard from "@/components/PropertyCard";
 
 interface Property {
   id: string;
@@ -26,7 +27,9 @@ interface Property {
   size_sqft: number | null;
   description: string | null;
   image_url: string | null;
+  image_urls: string[] | null;
   status: string;
+  created_at?: string;
   distance?: number; // Calculated distance from user's location
 }
 
@@ -371,85 +374,26 @@ const Browse = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProperties.map((property) => (
-              <Card key={property.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-video bg-gray-100 relative">
-                  {property.image_url ? (
-                    <img
-                      src={property.image_url}
-                      alt={property.title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-real-estate-gray/10">
-                      <span className="text-real-estate-gray">No Image</span>
-                    </div>
-                  )}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                  >
-                    <Heart className="h-4 w-4" />
-                  </Button>
-                </div>
-                
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-real-estate-navy line-clamp-2 flex-1">
-                      {property.title}
-                    </h3>
-                    <span className="px-2 py-1 text-xs font-medium bg-real-estate-blue/10 text-real-estate-blue rounded-full ml-2 whitespace-nowrap">
-                      {property.property_type}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1 text-real-estate-gray mb-3">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{property.location}</span>
-                    {property.distance && (
-                      <span className="text-xs text-real-estate-blue ml-2">
-                        • {formatDistance(property.distance)}
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-4 text-sm text-real-estate-gray">
-                      <div className="flex items-center gap-1">
-                        <Bed className="h-4 w-4" />
-                        <span>{property.bedrooms}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Bath className="h-4 w-4" />
-                        <span>{property.bathrooms}</span>
-                      </div>
-                      {property.size_sqft && (
-                        <div className="flex items-center gap-1">
-                          <Square className="h-4 w-4" />
-                          <span>{property.size_sqft} sq ft</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-2xl font-bold text-real-estate-blue">
-                        {formatPrice(property.rent_amount)}
-                      </span>
-                      <span className="text-real-estate-gray text-sm">
-                        {property.property_type.toLowerCase() === 'lodging' || property.property_type.toLowerCase() === 'bnb' 
-                          ? '/24hrs' 
-                          : '/month'
-                        }
-                      </span>
-                    </div>
-                    <Button size="sm" onClick={() => navigate(`/property/${property.id}`)}>
-                      View Details
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+              <PropertyCard
+                key={property.id}
+                id={property.id}
+                image={property.image_url || "/placeholder.svg"}
+                imageUrls={property.image_urls || []}
+                price={formatPrice(property.rent_amount)}
+                address={property.title}
+                city={property.location}
+                beds={property.bedrooms}
+                baths={property.bathrooms}
+                sqft={property.size_sqft || 1000}
+                type={property.property_type}
+                isNew={(() => {
+                  const createdDate = new Date(property.created_at || '');
+                  const nowDate = new Date();
+                  const diffTime = nowDate.getTime() - createdDate.getTime();
+                  const diffDays = diffTime / (1000 * 3600 * 24);
+                  return diffDays <= 7;
+                })()}
+              />
             ))}
           </div>
         )}
