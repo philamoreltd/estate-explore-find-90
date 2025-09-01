@@ -378,7 +378,7 @@ const Browse = () => {
                 key={property.id}
                 id={property.id}
                 image={property.image_url || "/placeholder.svg"}
-                imageUrls={property.image_urls || []}
+                imageUrls={property.image_urls}
                 price={formatPrice(property.rent_amount)}
                 address={property.title}
                 city={property.location}
