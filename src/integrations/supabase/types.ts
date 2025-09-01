@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
@@ -104,6 +104,53 @@ export type Database = {
         }
         Relationships: []
       }
+      property_notifications: {
+        Row: {
+          created_at: string
+          email_sent_to: string
+          id: string
+          landlord_id: string
+          landlord_response: string | null
+          notification_type: string
+          property_id: string
+          responded_at: string | null
+          response_token: string | null
+          sent_at: string
+        }
+        Insert: {
+          created_at?: string
+          email_sent_to: string
+          id?: string
+          landlord_id: string
+          landlord_response?: string | null
+          notification_type?: string
+          property_id: string
+          responded_at?: string | null
+          response_token?: string | null
+          sent_at?: string
+        }
+        Update: {
+          created_at?: string
+          email_sent_to?: string
+          id?: string
+          landlord_id?: string
+          landlord_response?: string | null
+          notification_type?: string
+          property_id?: string
+          responded_at?: string | null
+          response_token?: string | null
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_notifications_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           assigned_at: string
@@ -139,8 +186,8 @@ export type Database = {
       }
       has_role: {
         Args: {
-          _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
         }
         Returns: boolean
       }
