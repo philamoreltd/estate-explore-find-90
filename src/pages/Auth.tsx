@@ -190,7 +190,10 @@ const Auth = () => {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <Home className="h-8 w-8 text-real-estate-blue mr-2" />
-            <span className="text-2xl font-bold text-real-estate-navy">Housevilla Hub</span>
+            <div className="text-2xl font-bold">
+              <span className="text-real-estate-blue">Housevilla</span>
+              <span className="text-real-estate-navy ml-1">Hub</span>
+            </div>
           </div>
           <CardTitle className="text-center">Welcome</CardTitle>
           <CardDescription className="text-center">
