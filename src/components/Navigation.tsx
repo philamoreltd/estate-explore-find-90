@@ -41,9 +41,9 @@ const Navigation = () => {
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
               <Home className="h-8 w-8 text-real-estate-blue mr-2" />
-              <div className="text-2xl font-bold">
-                <span className="text-real-estate-blue">Housevilla</span>
-                <span className="text-real-estate-navy ml-1">Hub</span>
+              <div className="text-xl font-bold leading-tight">
+                <div className="text-real-estate-blue">Housevilla</div>
+                <div className="text-real-estate-navy">Hub</div>
               </div>
             </div>
           </div>
