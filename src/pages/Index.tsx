@@ -16,7 +16,7 @@ const Index = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">NyumbaLink</h3>
+              <h3 className="text-lg font-semibold mb-4">Housevilla Hub</h3>
               <p className="text-white/80 text-sm">
                 Your trusted partner in finding the perfect rental home. 
                 We make renting in Kenya simple and stress-free.
@@ -55,7 +55,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-white/80">
-            <p>&copy; 2024 NyumbaLink. All rights reserved.</p>
+            <p>&copy; 2024 Housevilla Hub. All rights reserved.</p>
           </div>
         </div>
       </footer>
