@@ -191,7 +191,7 @@ const Auth = () => {
           <div className="flex items-center justify-center mb-4">
             <Home className="h-8 w-8 text-real-estate-blue mr-2" />
             <div className="text-xl font-bold leading-tight">
-              <div className="text-real-estate-blue">Housevilla</div>
+              <div className="text-foreground">Housevilla</div>
               <div className="text-real-estate-navy">Hub</div>
             </div>
           </div>
