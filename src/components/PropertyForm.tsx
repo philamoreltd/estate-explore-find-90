@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Upload, X } from "lucide-react";
+import { Loader2, Upload, X, Phone } from "lucide-react";
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -23,6 +23,7 @@ const propertySchema = z.object({
   size_sqft: z.number().optional(),
   description: z.string().optional(),
   status: z.string().min(1, "Status is required"),
+  phone: z.string().min(1, "Phone number is required").regex(/^[\+]?[0-9\s\-\(\)]{10,}$/, "Please enter a valid phone number"),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -52,6 +53,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
       size_sqft: undefined,
       description: "",
       status: "available",
+      phone: "",
     },
   });
 
@@ -91,6 +93,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         size_sqft: data.size_sqft || undefined,
         description: data.description || "",
         status: data.status,
+        phone: data.phone || "",
       });
 
       if (data.image_url) {
@@ -170,6 +173,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         status: data.status,
         user_id: user.id,
         image_url: imageUrl,
+        phone: data.phone,
       };
 
       let result;
@@ -341,6 +345,27 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Nairobi, Kenya" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>Contact Phone Number</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input 
+                          placeholder="Enter contact phone number" 
+                          {...field} 
+                          className="pl-10"
+                        />
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
