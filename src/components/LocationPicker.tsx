@@ -31,12 +31,9 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if we have a Mapbox token in environment or ask user to provide it
-    const token = process.env.MAPBOX_PUBLIC_TOKEN || '';
-    if (token) {
-      setMapboxToken(token);
-      setIsTokenSet(true);
-    }
+    // In Lovable projects, we don't use process.env for client-side tokens
+    // Users need to provide their Mapbox public token through the UI
+    // Note: For production apps, consider storing this token in Supabase secrets
   }, []);
 
   useEffect(() => {
