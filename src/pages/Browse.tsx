@@ -30,6 +30,8 @@ interface Property {
   image_urls: string[] | null;
   status: string;
   created_at?: string;
+  user_id: string;
+  contact?: string;
   distance?: number; // Calculated distance from user's location
 }
 

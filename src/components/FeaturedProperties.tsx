@@ -398,6 +398,7 @@ const FeaturedProperties = () => {
               type="For Rent"
               isNew={isNewProperty(property.created_at)}
               landlordId={property.user_id}
+              contact={(property as any).contact}
             />
           ))}
         </div>

@@ -48,6 +48,7 @@ export type Database = {
         Row: {
           bathrooms: number
           bedrooms: number
+          contact: string | null
           created_at: string
           description: string | null
           id: string
@@ -68,6 +69,7 @@ export type Database = {
         Insert: {
           bathrooms: number
           bedrooms: number
+          contact?: string | null
           created_at?: string
           description?: string | null
           id?: string
@@ -88,6 +90,7 @@ export type Database = {
         Update: {
           bathrooms?: number
           bedrooms?: number
+          contact?: string | null
           created_at?: string
           description?: string | null
           id?: string

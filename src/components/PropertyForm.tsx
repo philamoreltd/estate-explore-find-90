@@ -17,6 +17,7 @@ const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
   property_type: z.string().min(1, "Property type is required"),
   location: z.string().min(1, "Location is required"),
+  contact: z.string().min(1, "Contact information is required"),
   rent_amount: z.number().min(1, "Rent amount must be greater than 0"),
   bedrooms: z.number().min(0, "Bedrooms must be 0 or more"),
   bathrooms: z.number().min(0, "Bathrooms must be 0 or more"),
@@ -47,6 +48,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
       title: "",
       property_type: "",
       location: "",
+      contact: "",
       rent_amount: 0,
       bedrooms: 0,
       bathrooms: 0,
@@ -87,6 +89,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         title: data.title,
         property_type: data.property_type,
         location: data.location,
+        contact: (data as any).contact || "",
         rent_amount: data.rent_amount,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
@@ -165,6 +168,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         title: data.title,
         property_type: data.property_type,
         location: data.location,
+        contact: data.contact,
         rent_amount: data.rent_amount,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
@@ -341,10 +345,24 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                 control={form.control}
                 name="location"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-2">
+                  <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Nairobi, Kenya" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="contact"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Contact Information</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g., Contact John via WhatsApp" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

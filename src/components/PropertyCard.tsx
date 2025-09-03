@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
-import { Heart, Bed, Bath, Square, MapPin } from "lucide-react";
+import { Heart, Bed, Bath, Square, MapPin, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ScheduleViewingModal from "./ScheduleViewingModal";
 
@@ -19,6 +19,7 @@ interface PropertyCardProps {
   type: string;
   isNew?: boolean;
   landlordId?: string;
+  contact?: string;
 }
 
 const PropertyCard = ({ 
@@ -33,7 +34,8 @@ const PropertyCard = ({
   sqft, 
   type, 
   isNew = false,
-  landlordId
+  landlordId,
+  contact
 }: PropertyCardProps) => {
   const navigate = useNavigate();
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
@@ -116,6 +118,14 @@ const PropertyCard = ({
               {address}, {city}
             </span>
           </div>
+
+          {/* Contact Information */}
+          {contact && (
+            <div className="flex items-center text-real-estate-gray mb-3">
+              <MessageCircle className="h-4 w-4 mr-1" />
+              <span className="text-sm">{contact}</span>
+            </div>
+          )}
 
           {/* Property Details */}
           <div className="flex items-center gap-4 mb-4 text-real-estate-gray">
