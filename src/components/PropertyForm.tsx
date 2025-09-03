@@ -93,7 +93,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         size_sqft: data.size_sqft || undefined,
         description: data.description || "",
         status: data.status,
-        phone: data.phone || "",
+        phone: (data as any).phone || "",
       });
 
       if (data.image_url) {

@@ -56,6 +56,7 @@ export type Database = {
           latitude: number | null
           location: string
           longitude: number | null
+          phone: string | null
           property_type: string
           rent_amount: number
           size_sqft: number | null
@@ -75,6 +76,7 @@ export type Database = {
           latitude?: number | null
           location: string
           longitude?: number | null
+          phone?: string | null
           property_type: string
           rent_amount: number
           size_sqft?: number | null
@@ -94,6 +96,7 @@ export type Database = {
           latitude?: number | null
           location?: string
           longitude?: number | null
+          phone?: string | null
           property_type?: string
           rent_amount?: number
           size_sqft?: number | null
