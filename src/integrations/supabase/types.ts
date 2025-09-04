@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      contact_payments: {
+        Row: {
+          amount: number
+          checkout_request_id: string | null
+          created_at: string
+          id: string
+          payment_status: string
+          phone_number: string
+          property_id: string | null
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          checkout_request_id?: string | null
+          created_at?: string
+          id?: string
+          payment_status?: string
+          phone_number: string
+          property_id?: string | null
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          checkout_request_id?: string | null
+          created_at?: string
+          id?: string
+          payment_status?: string
+          phone_number?: string
+          property_id?: string | null
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_payments_property_id_fkey"
+            columns: ["property_id"]
+            isOneToOne: false
+            referencedRelation: "properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -189,6 +236,10 @@ export type Database = {
       get_current_user_role: {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_paid_for_contact_access: {
+        Args: { property_id: string; user_id: string }
+        Returns: boolean
       }
       has_role: {
         Args: {
