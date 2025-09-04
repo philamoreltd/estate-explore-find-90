@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import Navigation from "@/components/Navigation";
 import ContactModal from "@/components/ContactModal";
 import ScheduleViewingModal from "@/components/ScheduleViewingModal";
+import PaymentModal from "@/components/PaymentModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -43,7 +44,9 @@ const PropertyDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showContactModal, setShowContactModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [hasPaidForContact, setHasPaidForContact] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -78,6 +81,11 @@ const PropertyDetails = () => {
       if (data.user_id) {
         await fetchLandlordProfile(data.user_id);
       }
+
+      // Check if user has paid for contact access
+      if (user) {
+        await checkPaymentStatus(propertyId);
+      }
     } catch (error) {
       console.error('Error fetching property:', error);
       toast({
@@ -88,6 +96,26 @@ const PropertyDetails = () => {
       navigate('/browse');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const checkPaymentStatus = async (propertyId: string) => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('contact_payments')
+        .select('payment_status')
+        .eq('user_id', user.id)
+        .eq('property_id', propertyId)
+        .eq('payment_status', 'completed')
+        .maybeSingle();
+
+      if (!error && data) {
+        setHasPaidForContact(true);
+      }
+    } catch (error) {
+      console.error('Error checking payment status:', error);
     }
   };
 
@@ -395,14 +423,26 @@ const PropertyDetails = () => {
                 <div className="space-y-4">
                   {landlordProfile?.phone ? (
                     user ? (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        onClick={() => window.open(`tel:${landlordProfile.phone}`, '_self')}
-                      >
-                        <Phone className="h-4 w-4 mr-2" />
-                        Call {landlordProfile.phone}
-                      </Button>
+                      hasPaidForContact ? (
+                        <Button 
+                          className="w-full" 
+                          size="lg"
+                          onClick={() => window.open(`tel:${landlordProfile.phone}`, '_self')}
+                        >
+                          <Phone className="h-4 w-4 mr-2" />
+                          Call {landlordProfile.phone}
+                        </Button>
+                      ) : (
+                        <Button 
+                          className="w-full" 
+                          size="lg"
+                          variant="outline"
+                          onClick={() => setShowPaymentModal(true)}
+                        >
+                          <Phone className="h-4 w-4 mr-2" />
+                          Pay KES 50 to view contact
+                        </Button>
+                      )
                     ) : (
                       <Button 
                         className="w-full" 
@@ -411,7 +451,7 @@ const PropertyDetails = () => {
                         onClick={() => navigate('/auth')}
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Sign in to view phone number
+                        Sign in to access contact
                       </Button>
                     )
                   ) : (
@@ -432,7 +472,7 @@ const PropertyDetails = () => {
                         onClick={() => navigate('/auth')}
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Sign in to view contact details
+                        Sign in to access contact
                       </Button>
                     )
                   )}
@@ -469,9 +509,14 @@ const PropertyDetails = () => {
                   {landlordProfile?.phone && (
                     <div className="flex items-center justify-center gap-2 text-real-estate-gray mb-2">
                       <Phone className="h-4 w-4" />
-                      <span className="text-sm">{maskPhoneNumber(landlordProfile.phone)}</span>
+                      <span className="text-sm">
+                        {user ? (hasPaidForContact ? landlordProfile.phone : "Pay to reveal") : "Sign in to access"}
+                      </span>
                       {!user && (
-                        <span className="text-xs text-real-estate-blue ml-1">(Sign in to view full number)</span>
+                        <span className="text-xs text-real-estate-blue ml-1">(Sign in required)</span>
+                      )}
+                      {user && !hasPaidForContact && (
+                        <span className="text-xs text-real-estate-blue ml-1">(KES 50 to unlock)</span>
                       )}
                     </div>
                   )}
@@ -502,6 +547,18 @@ const PropertyDetails = () => {
         propertyId={property.id}
         propertyTitle={property.title}
         landlordId={property.user_id}
+      />
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        propertyId={property.id}
+        propertyTitle={property.title}
+        onPaymentSuccess={() => {
+          setHasPaidForContact(true);
+          setShowPaymentModal(false);
+        }}
       />
     </div>
   );
