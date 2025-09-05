@@ -491,10 +491,10 @@ const PropertyDetails = () => {
                     variant="outline" 
                     className="w-full" 
                     size="lg"
-                    onClick={() => setShowContactModal(true)}
+                    onClick={() => user ? setShowContactModal(true) : navigate('/auth')}
                   >
                     <Mail className="h-4 w-4 mr-2" />
-                    Send Message
+                    {user ? "Send Message" : "Sign in to Message"}
                   </Button>
                 </div>
 
@@ -538,6 +538,11 @@ const PropertyDetails = () => {
         propertyId={property.id}
         propertyTitle={property.title}
         landlordId={property.user_id}
+        hasPaidForContact={hasPaidForContact}
+        onPaymentRequired={() => {
+          setShowContactModal(false);
+          setShowPaymentModal(true);
+        }}
       />
 
       {/* Schedule Viewing Modal */}

@@ -14,9 +14,11 @@ interface ContactModalProps {
   propertyId: string;
   propertyTitle: string;
   landlordId: string;
+  hasPaidForContact: boolean;
+  onPaymentRequired: () => void;
 }
 
-const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId }: ContactModalProps) => {
+const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId, hasPaidForContact, onPaymentRequired }: ContactModalProps) => {
   const [message, setMessage] = useState("");
   const [phone, setPhone] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +34,16 @@ const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId }
         description: "Please sign in to contact the landlord.",
         variant: "destructive",
       });
+      return;
+    }
+
+    if (!hasPaidForContact) {
+      toast({
+        title: "Payment Required",
+        description: "Please pay to access contact information before sending a message.",
+        variant: "destructive",
+      });
+      onPaymentRequired();
       return;
     }
 
@@ -74,8 +86,26 @@ const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId }
         <DialogHeader>
           <DialogTitle>Contact Landlord</DialogTitle>
         </DialogHeader>
-        
-        <form onSubmit={handleSubmit} className="space-y-4">
+
+        {!hasPaidForContact ? (
+          <div className="space-y-4 text-center">
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-amber-800 font-medium mb-2">Payment Required</p>
+              <p className="text-amber-700 text-sm">
+                To protect landlord contact information and prevent spam, you need to pay KES 50 to access messaging features.
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                Cancel
+              </Button>
+              <Button type="button" onClick={onPaymentRequired} className="flex-1">
+                Pay KES 50 to Contact
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="property">Property</Label>
             <Input 
@@ -109,15 +139,16 @@ const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId }
             />
           </div>
           
-          <div className="flex gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Sending..." : "Send Message"}
-            </Button>
-          </div>
-        </form>
+            <div className="flex gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSubmitting} className="flex-1">
+                {isSubmitting ? "Sending..." : "Send Message"}
+              </Button>
+            </div>
+          </form>
+        )}
       </DialogContent>
     </Dialog>
   );
