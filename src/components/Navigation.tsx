@@ -57,7 +57,7 @@ const Navigation = () => {
               <a href="/browse" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Browse Rentals
               </a>
-              <a href="/tenants" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
+              <a href="/add-property" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
                 Add Property
               </a>
               <a href="/landlords" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
@@ -93,7 +93,7 @@ const Navigation = () => {
                 Sign In
               </Button>
             )}
-            <Button variant="hero" size="sm" onClick={() => navigate("/tenants")}>
+            <Button variant="hero" size="sm" onClick={() => navigate("/add-property")}>
               List Rental
             </Button>
           </div>
@@ -132,7 +132,7 @@ const Navigation = () => {
                 Browse Rentals
               </button>
               <button
-                onClick={() => handleMobileNavigation('/tenants')}
+                onClick={() => handleMobileNavigation('/add-property')}
                 className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
               >
                 Add Property
@@ -195,7 +195,7 @@ const Navigation = () => {
                   variant="hero" 
                   size="sm" 
                   className="w-full"
-                  onClick={() => handleMobileNavigation("/tenants")}
+                  onClick={() => handleMobileNavigation("/add-property")}
                 >
                   List Rental
                 </Button>
