@@ -11,20 +11,18 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Upload, X, Phone } from "lucide-react";
+import { Loader2, Upload, X } from "lucide-react";
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
   property_type: z.string().min(1, "Property type is required"),
   location: z.string().min(1, "Location is required"),
-  contact: z.string().min(1, "Contact information is required"),
   rent_amount: z.number().min(1, "Rent amount must be greater than 0"),
   bedrooms: z.number().min(0, "Bedrooms must be 0 or more"),
   bathrooms: z.number().min(0, "Bathrooms must be 0 or more"),
   size_sqft: z.number().optional(),
   description: z.string().optional(),
   status: z.string().min(1, "Status is required"),
-  phone: z.string().min(1, "Phone number is required").regex(/^[\+]?[0-9\s\-\(\)]{10,}$/, "Please enter a valid phone number"),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -48,14 +46,12 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
       title: "",
       property_type: "",
       location: "",
-      contact: "",
       rent_amount: 0,
       bedrooms: 0,
       bathrooms: 0,
       size_sqft: undefined,
       description: "",
       status: "available",
-      phone: "",
     },
   });
 
@@ -89,14 +85,12 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         title: data.title,
         property_type: data.property_type,
         location: data.location,
-        contact: (data as any).contact || "",
         rent_amount: data.rent_amount,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
         size_sqft: data.size_sqft || undefined,
         description: data.description || "",
         status: data.status,
-        phone: (data as any).phone || "",
       });
 
       if (data.image_url) {
@@ -168,7 +162,6 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         title: data.title,
         property_type: data.property_type,
         location: data.location,
-        contact: data.contact,
         rent_amount: data.rent_amount,
         bedrooms: data.bedrooms,
         bathrooms: data.bathrooms,
@@ -177,7 +170,6 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         status: data.status,
         user_id: user.id,
         image_url: imageUrl,
-        phone: data.phone,
       };
 
       let result;
@@ -362,47 +354,12 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
 
               <FormField
                 control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                        <Input 
-                          placeholder="Enter phone number" 
-                          {...field} 
-                          className="pl-10"
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
                       <Input placeholder="e.g., Nairobi, Kenya" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="contact"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contact Information</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., Contact John via WhatsApp" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
