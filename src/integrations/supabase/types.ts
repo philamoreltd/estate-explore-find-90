@@ -237,6 +237,30 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_properties_with_conditional_phone: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          bathrooms: number
+          bedrooms: number
+          contact: string
+          created_at: string
+          description: string
+          id: string
+          image_url: string
+          image_urls: string[]
+          latitude: number
+          location: string
+          longitude: number
+          phone: string
+          property_type: string
+          rent_amount: number
+          size_sqft: number
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_paid_for_contact_access: {
         Args: { property_id: string; user_id: string }
         Returns: boolean

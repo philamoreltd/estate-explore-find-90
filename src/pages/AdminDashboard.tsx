@@ -123,8 +123,7 @@ const AdminDashboard = () => {
 
       // Fetch all properties without the join first
       const { data: propertiesData, error: propertiesError } = await supabase
-        .from('properties')
-        .select('*')
+        .rpc('get_properties_with_conditional_phone')
         .order('created_at', { ascending: false });
 
       if (propertiesError) {

@@ -53,8 +53,7 @@ const FeaturedProperties = () => {
   const fetchFeaturedProperties = async () => {
     try {
       const { data, error } = await supabase
-        .from('properties')
-        .select('*')
+        .rpc('get_properties_with_conditional_phone')
         .eq('status', 'available')
         .order('created_at', { ascending: false })
         .limit(6); // Show 6 featured properties

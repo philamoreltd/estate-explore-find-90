@@ -42,8 +42,7 @@ const Landlords = () => {
 
     try {
       const { data, error } = await supabase
-        .from('properties')
-        .select('*')
+        .rpc('get_properties_with_conditional_phone')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 

@@ -28,6 +28,7 @@ interface Property {
   status: string;
   created_at: string;
   user_id: string;
+  phone: string | null;
 }
 
 interface LandlordProfile {
@@ -59,8 +60,7 @@ const PropertyDetails = () => {
   const fetchProperty = async (propertyId: string) => {
     try {
       const { data, error } = await supabase
-        .from('properties')
-        .select('*')
+        .rpc('get_properties_with_conditional_phone')
         .eq('id', propertyId)
         .single();
 
@@ -421,28 +421,16 @@ const PropertyDetails = () => {
                 <Separator className="my-6" />
 
                 <div className="space-y-4">
-                  {landlordProfile?.phone ? (
+                  {property.phone ? (
                     user ? (
-                      hasPaidForContact ? (
-                        <Button 
-                          className="w-full" 
-                          size="lg"
-                          onClick={() => window.open(`tel:${landlordProfile.phone}`, '_self')}
-                        >
-                          <Phone className="h-4 w-4 mr-2" />
-                          Call {landlordProfile.phone}
-                        </Button>
-                      ) : (
-                        <Button 
-                          className="w-full" 
-                          size="lg"
-                          variant="outline"
-                          onClick={() => setShowPaymentModal(true)}
-                        >
-                          <Phone className="h-4 w-4 mr-2" />
-                          Pay KES 50 to view contact
-                        </Button>
-                      )
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={() => window.open(`tel:${property.phone}`, '_self')}
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call {property.phone}
+                      </Button>
                     ) : (
                       <Button 
                         className="w-full" 
@@ -451,7 +439,7 @@ const PropertyDetails = () => {
                         onClick={() => navigate('/auth')}
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Sign in to access contact
+                        Sign in to view contact
                       </Button>
                     )
                   ) : (
@@ -462,7 +450,7 @@ const PropertyDetails = () => {
                         disabled
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Phone not provided by landlord
+                        Phone not provided
                       </Button>
                     ) : (
                       <Button 
@@ -472,7 +460,7 @@ const PropertyDetails = () => {
                         onClick={() => navigate('/auth')}
                       >
                         <Phone className="h-4 w-4 mr-2" />
-                        Sign in to access contact
+                        Sign in to view contact
                       </Button>
                     )
                   )}

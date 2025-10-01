@@ -60,8 +60,7 @@ const Browse = () => {
   const fetchProperties = async () => {
     try {
       const { data, error } = await supabase
-        .from('properties')
-        .select('*')
+        .rpc('get_properties_with_conditional_phone')
         .eq('status', 'available')
         .order('created_at', { ascending: false });
 
