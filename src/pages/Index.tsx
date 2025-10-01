@@ -47,7 +47,7 @@ const Index = () => {
               <h4 className="font-semibold mb-4">Connect</h4>
               <ul className="space-y-2 text-sm text-white/80">
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Facebook</a></li>
-                <li><a href="#" className="hover:text-real-estate-gold transition-colors">Twitter</a></li>
+                <li><a href="#" className="hover:text-real-estate-gold transition-colors">X</a></li>
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Instagram</a></li>
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">LinkedIn</a></li>
               </ul>
@@ -55,7 +55,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-white/80">
-            <p>&copy; 2024 Housevilla Hub. All rights reserved.</p>
+            <p>&copy; 2025 Housevilla Hub. All rights reserved.</p>
           </div>
         </div>
       </footer>
