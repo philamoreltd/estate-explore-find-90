@@ -47,7 +47,7 @@ const Index = () => {
               <h4 className="font-semibold mb-4">Connect</h4>
               <ul className="space-y-2 text-sm text-white/80">
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Facebook</a></li>
-                <li><a href="#" className="hover:text-real-estate-gold transition-colors">X</a></li>
+                <li><a href="#" className="hover:text-real-estate-gold transition-colors">X- Space</a></li>
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">Instagram</a></li>
                 <li><a href="#" className="hover:text-real-estate-gold transition-colors">LinkedIn</a></li>
               </ul>
