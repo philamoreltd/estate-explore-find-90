@@ -38,8 +38,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   const form = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
@@ -96,8 +96,10 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         status: data.status,
       });
 
-      if (data.image_url) {
-        setImagePreview(data.image_url);
+      if (data.image_urls && data.image_urls.length > 0) {
+        setImagePreviews(data.image_urls);
+      } else if (data.image_url) {
+        setImagePreviews([data.image_url]);
       }
     } catch (error) {
       console.error('Error fetching property:', error);
@@ -105,37 +107,47 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setImageFiles(prev => [...prev, ...files]);
+      
+      // Generate previews for all new files
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagePreviews(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
-  const uploadImage = async (): Promise<string | null> => {
-    if (!imageFile || !user) return null;
+  const uploadImages = async (): Promise<string[]> => {
+    if (imageFiles.length === 0 || !user) return [];
 
-    const fileExt = imageFile.name.split('.').pop();
-    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+    const uploadedUrls: string[] = [];
 
-    const { error: uploadError } = await supabase.storage
-      .from('property-images')
-      .upload(fileName, imageFile);
+    for (const file of imageFiles) {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}-${Math.random()}.${fileExt}`;
 
-    if (uploadError) {
-      console.error('Error uploading image:', uploadError);
-      return null;
+      const { error: uploadError } = await supabase.storage
+        .from('property-images')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error('Error uploading image:', uploadError);
+        continue;
+      }
+
+      const { data } = supabase.storage
+        .from('property-images')
+        .getPublicUrl(fileName);
+
+      uploadedUrls.push(data.publicUrl);
     }
 
-    const { data } = supabase.storage
-      .from('property-images')
-      .getPublicUrl(fileName);
-
-    return data.publicUrl;
+    return uploadedUrls;
   };
 
   const onSubmit = async (data: PropertyFormData) => {
@@ -151,14 +163,12 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
     setIsLoading(true);
 
     try {
-      let imageUrl = imagePreview;
+      let imageUrls = imagePreviews.filter(url => url.startsWith('http')); // Keep existing URLs
 
-      // Upload new image if one was selected
-      if (imageFile) {
-        const uploadedUrl = await uploadImage();
-        if (uploadedUrl) {
-          imageUrl = uploadedUrl;
-        }
+      // Upload new images if any were selected
+      if (imageFiles.length > 0) {
+        const uploadedUrls = await uploadImages();
+        imageUrls = [...imageUrls, ...uploadedUrls];
       }
 
       const propertyData = {
@@ -173,7 +183,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         description: data.description || null,
         status: data.status,
         user_id: user.id,
-        image_url: imageUrl,
+        image_url: imageUrls[0] || null, // First image as primary
+        image_urls: imageUrls.length > 0 ? imageUrls : null,
       };
 
       let result;
@@ -230,45 +241,55 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Image Upload */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Property Image</label>
-              <div className="flex items-center gap-4">
-                {imagePreview && (
-                  <div className="relative">
-                    <img
-                      src={imagePreview}
-                      alt="Property preview"
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="destructive"
-                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                      onClick={() => {
-                        setImagePreview(null);
-                        setImageFile(null);
-                      }}
-                    >
-                      <X className="h-3 w-3" />
-                    </Button>
-                  </div>
-                )}
-                <div>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                    id="image-upload"
-                  />
-                  <label
-                    htmlFor="image-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer"
-                  >
-                    <Upload className="h-4 w-4" />
-                    Upload Image
-                  </label>
+              <label className="text-sm font-medium">Property Images</label>
+              
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-3 gap-3 mb-3">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Property preview ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="destructive"
+                        className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                        onClick={() => {
+                          setImagePreviews(prev => prev.filter((_, i) => i !== index));
+                          setImageFiles(prev => prev.filter((_, i) => i !== index));
+                        }}
+                      >
+                        <X className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
                 </div>
+              )}
+              
+              {/* Upload Button */}
+              <div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleImageChange}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="inline-flex items-center gap-2 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md cursor-pointer"
+                >
+                  <Upload className="h-4 w-4" />
+                  Upload Images (Multiple)
+                </label>
+                <p className="text-xs text-muted-foreground mt-1">
+                  You can select multiple images at once
+                </p>
               </div>
             </div>
 
