@@ -66,7 +66,7 @@ const PaymentModal = ({
       const { data, error } = await supabase.functions.invoke("mpesa-payment", {
         body: {
           propertyId,
-          amount: 100, // KES 100 for contact access
+          amount: 10, // KES 10 for contact access
           phoneNumber: phoneNumber.trim(),
         },
       });
@@ -163,7 +163,7 @@ const PaymentModal = ({
         
         <div className="space-y-4">
           <div className="text-center py-4 border rounded-lg bg-muted/50">
-            <h3 className="font-semibold text-lg">KES 100</h3>
+            <h3 className="font-semibold text-lg">KES 10</h3>
             <p className="text-sm text-muted-foreground">
               One-time payment to access landlord contact for:
             </p>
@@ -208,7 +208,7 @@ const PaymentModal = ({
                     Processing...
                   </>
                 ) : (
-                  "Pay KES 100"
+                  "Pay KES 10"
                 )}
               </Button>
             </div>
