@@ -330,9 +330,10 @@ const AdminDashboard = () => {
 
         {/* Tabs for different views */}
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="users">Users Management</TabsTrigger>
             <TabsTrigger value="properties">Properties Management</TabsTrigger>
+            <TabsTrigger value="payments" onClick={() => navigate('/admin/payments')}>Payment History</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-6">
