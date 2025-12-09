@@ -13,6 +13,7 @@ import PropertyDetails from "./pages/PropertyDetails";
 import AddProperty from "./pages/AddProperty";
 import EditProperty from "./pages/EditProperty";
 import AdminDashboard from "./pages/AdminDashboard";
+import PaymentHistory from "./pages/PaymentHistory";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
@@ -52,6 +53,11 @@ const App = () => (
             <Route path="/admin" element={
               <ProtectedRoute>
                 <AdminDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/admin/payments" element={
+              <ProtectedRoute>
+                <PaymentHistory />
               </ProtectedRoute>
             } />
             <Route path="/auth" element={<Auth />} />
