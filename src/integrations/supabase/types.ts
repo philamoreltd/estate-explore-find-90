@@ -234,11 +234,11 @@ export type Database = {
     }
     Functions: {
       get_current_user_role: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
       get_properties_with_conditional_phone: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: {
           bathrooms: number
           bedrooms: number
@@ -272,10 +272,7 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "landlord" | "tenant" | "user"

@@ -421,48 +421,43 @@ const PropertyDetails = () => {
                 <Separator className="my-6" />
 
                 <div className="space-y-4">
-                  {property.phone ? (
-                    user ? (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        onClick={() => window.open(`tel:${property.phone}`, '_self')}
-                      >
-                        <Phone className="h-4 w-4 mr-2" />
-                        Call {property.phone}
-                      </Button>
-                    ) : (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        variant="outline"
-                        onClick={() => navigate('/auth')}
-                      >
-                        <Phone className="h-4 w-4 mr-2" />
-                        Sign in to view contact
-                      </Button>
-                    )
+                  {!user ? (
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      variant="outline"
+                      onClick={() => navigate('/auth')}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Sign in to view contact
+                    </Button>
+                  ) : !hasPaidForContact ? (
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      onClick={() => setShowPaymentModal(true)}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Pay KES 100 to view contact
+                    </Button>
+                  ) : property.phone ? (
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      onClick={() => window.open(`tel:${property.phone}`, '_self')}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Call {property.phone}
+                    </Button>
                   ) : (
-                    user ? (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        disabled
-                      >
-                        <Phone className="h-4 w-4 mr-2" />
-                        Phone not provided
-                      </Button>
-                    ) : (
-                      <Button 
-                        className="w-full" 
-                        size="lg"
-                        variant="outline"
-                        onClick={() => navigate('/auth')}
-                      >
-                        <Phone className="h-4 w-4 mr-2" />
-                        Sign in to view contact
-                      </Button>
-                    )
+                    <Button 
+                      className="w-full" 
+                      size="lg"
+                      disabled
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Phone not provided
+                    </Button>
                   )}
                   
                   <Button 

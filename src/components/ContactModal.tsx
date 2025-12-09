@@ -92,7 +92,7 @@ const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId, 
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-amber-800 font-medium mb-2">Payment Required</p>
               <p className="text-amber-700 text-sm">
-                To protect landlord contact information and prevent spam, you need to pay KES 50 to access messaging features.
+                To protect landlord contact information and prevent spam, you need to pay KES 100 to access messaging features.
               </p>
             </div>
             <div className="flex gap-2">
@@ -100,7 +100,7 @@ const ContactModal = ({ isOpen, onClose, propertyId, propertyTitle, landlordId, 
                 Cancel
               </Button>
               <Button type="button" onClick={onPaymentRequired} className="flex-1">
-                Pay KES 50 to Contact
+                Pay KES 100 to Contact
               </Button>
             </div>
           </div>
