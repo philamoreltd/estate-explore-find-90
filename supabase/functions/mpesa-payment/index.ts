@@ -69,7 +69,17 @@ serve(async (req) => {
     console.log("Processing M-Pesa payment for user:", user.id, "property:", propertyId);
 
     // Get M-Pesa access token
-    const auth = btoa(`${Deno.env.get("MPESA_CONSUMER_KEY")}:${Deno.env.get("MPESA_CONSUMER_SECRET")}`);
+    const consumerKey = Deno.env.get("MPESA_CONSUMER_KEY");
+    const consumerSecret = Deno.env.get("MPESA_CONSUMER_SECRET");
+    
+    if (!consumerKey || !consumerSecret) {
+      console.error("M-Pesa credentials not configured");
+      throw new Error("M-Pesa credentials are not configured. Please contact support.");
+    }
+
+    console.log("Attempting M-Pesa auth with key length:", consumerKey.length);
+    
+    const auth = btoa(`${consumerKey}:${consumerSecret}`);
     
     const authResponse = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
       method: "GET",
@@ -79,11 +89,13 @@ serve(async (req) => {
     });
 
     if (!authResponse.ok) {
-      throw new Error(`M-Pesa auth failed: ${authResponse.statusText}`);
+      const errorText = await authResponse.text();
+      console.error("M-Pesa auth failed:", authResponse.status, errorText);
+      throw new Error(`M-Pesa authentication failed. Please verify API credentials are correct.`);
     }
 
     const authData: MpesaAuthResponse = await authResponse.json();
-    console.log("M-Pesa auth successful");
+    console.log("M-Pesa auth successful, token received");
 
     // Create payment record in database
     const supabaseService = createClient(
