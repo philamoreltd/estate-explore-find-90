@@ -265,7 +265,7 @@ export type Database = {
         }[]
       }
       has_paid_for_contact_access: {
-        Args: { property_id: string; user_id: string }
+        Args: { p_property_id: string; p_user_id: string }
         Returns: boolean
       }
       has_role: {

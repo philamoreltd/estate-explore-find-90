@@ -543,6 +543,7 @@ const PropertyDetails = () => {
         onClose={() => setShowPaymentModal(false)}
         propertyId={property.id}
         propertyTitle={property.title}
+        rentAmount={Number(property.rent_amount)}
         onPaymentSuccess={() => {
           setHasPaidForContact(true);
           setShowPaymentModal(false);
