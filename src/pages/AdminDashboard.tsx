@@ -13,7 +13,9 @@ import {
   DollarSign,
   Activity,
   UserCheck,
-  Building
+  Building,
+  Shield,
+  User
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -274,77 +276,107 @@ const AdminDashboard = () => {
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-real-estate-gray">Total Users</p>
-                  <p className="text-2xl font-bold text-real-estate-navy">{users.length}</p>
+                  <p className="text-xs text-muted-foreground">Total Users</p>
+                  <p className="text-xl font-bold text-foreground">{users.length}</p>
                 </div>
-                <Users className="h-8 w-8 text-real-estate-blue" />
+                <Users className="h-6 w-6 text-primary" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-real-estate-gray">Total Properties</p>
-                  <p className="text-2xl font-bold text-green-600">{properties.length}</p>
+                  <p className="text-xs text-muted-foreground">Landlords</p>
+                  <p className="text-xl font-bold text-blue-600">
+                    {users.filter(u => u.role === 'landlord').length}
+                  </p>
                 </div>
-                <Building className="h-8 w-8 text-green-600" />
+                <Building className="h-6 w-6 text-blue-600" />
               </div>
             </CardContent>
           </Card>
           
           <Card>
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-real-estate-gray">Available Properties</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-xs text-muted-foreground">Tenants</p>
+                  <p className="text-xl font-bold text-green-600">
+                    {users.filter(u => u.role === 'tenant').length}
+                  </p>
+                </div>
+                <User className="h-6 w-6 text-green-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Staff</p>
+                  <p className="text-xl font-bold text-purple-600">
+                    {users.filter(u => u.role === 'admin').length}
+                  </p>
+                </div>
+                <Shield className="h-6 w-6 text-purple-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Properties</p>
+                  <p className="text-xl font-bold text-orange-600">{properties.length}</p>
+                </div>
+                <Home className="h-6 w-6 text-orange-600" />
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground">Available</p>
+                  <p className="text-xl font-bold text-teal-600">
                     {properties.filter(p => p.status === 'available').length}
                   </p>
                 </div>
-                <Home className="h-8 w-8 text-blue-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-real-estate-gray">Total Revenue</p>
-                  <p className="text-2xl font-bold text-real-estate-blue">
-                    {formatPrice(properties.filter(p => p.status === 'rented').reduce((sum, p) => sum + p.rent_amount, 0))}
-                  </p>
-                </div>
-                <DollarSign className="h-8 w-8 text-real-estate-blue" />
+                <Activity className="h-6 w-6 text-teal-600" />
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Tabs for different views */}
-        <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users">Users Management</TabsTrigger>
-            <TabsTrigger value="properties">Properties Management</TabsTrigger>
-            <TabsTrigger value="payments" onClick={() => navigate('/admin/payments')}>Payment History</TabsTrigger>
+        <Tabs defaultValue="landlords" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="landlords">Landlords</TabsTrigger>
+            <TabsTrigger value="tenants">Tenants</TabsTrigger>
+            <TabsTrigger value="staff">Staff</TabsTrigger>
+            <TabsTrigger value="properties">Properties</TabsTrigger>
+            <TabsTrigger value="payments" onClick={() => navigate('/admin/payments')}>Payments</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="users" className="space-y-6">
+          <TabsContent value="landlords" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <UserCheck className="h-5 w-5" />
-                  Users Management
+                  <Building className="h-5 w-5 text-blue-600" />
+                  Landlords ({users.filter(u => u.role === 'landlord').length})
                 </CardTitle>
                 <CardDescription>
-                  View and manage all registered users and their roles
+                  Manage registered landlords
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -352,52 +384,151 @@ const AdminDashboard = () => {
                   <table className="w-full border-collapse">
                     <thead>
                       <tr className="border-b">
-                        <th className="text-left p-4">User</th>
+                        <th className="text-left p-4">Name</th>
                         <th className="text-left p-4">Email</th>
                         <th className="text-left p-4">Phone</th>
-                        <th className="text-left p-4">Role</th>
                         <th className="text-left p-4">Joined</th>
                         <th className="text-left p-4">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((userData) => (
-                        <tr key={userData.id} className="border-b hover:bg-gray-50">
-                          <td className="p-4">
-                            <div>
-                              <p className="font-medium">{userData.full_name || 'N/A'}</p>
-                            </div>
-                          </td>
-                          <td className="p-4 text-sm text-real-estate-gray">
-                            {userData.email}
-                          </td>
-                          <td className="p-4 text-sm text-real-estate-gray">
-                            {userData.phone || 'N/A'}
-                          </td>
-                          <td className="p-4">
-                            <Badge className={getRoleColor(userData.role)}>
-                              {userData.role}
-                            </Badge>
-                          </td>
-                          <td className="p-4 text-sm text-real-estate-gray">
+                      {users.filter(u => u.role === 'landlord').map((userData) => (
+                        <tr key={userData.id} className="border-b hover:bg-muted/50">
+                          <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
+                          <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
+                          <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
+                          <td className="p-4 text-sm text-muted-foreground">
                             {new Date(userData.created_at).toLocaleDateString()}
                           </td>
                           <td className="p-4">
-                            <div className="flex gap-2">
-                              <select
-                                value={userData.role}
-                                onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
-                                className="text-xs border rounded px-2 py-1"
-                              >
-                                <option value="user">User</option>
-                                <option value="tenant">Tenant</option>
-                                <option value="landlord">Landlord</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            </div>
+                            <select
+                              value={userData.role}
+                              onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
+                              className="text-xs border rounded px-2 py-1 bg-background"
+                            >
+                              <option value="user">User</option>
+                              <option value="tenant">Tenant</option>
+                              <option value="landlord">Landlord</option>
+                              <option value="admin">Admin</option>
+                            </select>
                           </td>
                         </tr>
                       ))}
+                      {users.filter(u => u.role === 'landlord').length === 0 && (
+                        <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No landlords registered</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="tenants" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5 text-green-600" />
+                  Tenants ({users.filter(u => u.role === 'tenant').length})
+                </CardTitle>
+                <CardDescription>
+                  Manage registered tenants
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-4">Name</th>
+                        <th className="text-left p-4">Email</th>
+                        <th className="text-left p-4">Phone</th>
+                        <th className="text-left p-4">Joined</th>
+                        <th className="text-left p-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.filter(u => u.role === 'tenant').map((userData) => (
+                        <tr key={userData.id} className="border-b hover:bg-muted/50">
+                          <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
+                          <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
+                          <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
+                          <td className="p-4 text-sm text-muted-foreground">
+                            {new Date(userData.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="p-4">
+                            <select
+                              value={userData.role}
+                              onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
+                              className="text-xs border rounded px-2 py-1 bg-background"
+                            >
+                              <option value="user">User</option>
+                              <option value="tenant">Tenant</option>
+                              <option value="landlord">Landlord</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </td>
+                        </tr>
+                      ))}
+                      {users.filter(u => u.role === 'tenant').length === 0 && (
+                        <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No tenants registered</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="staff" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-purple-600" />
+                  Staff / Admins ({users.filter(u => u.role === 'admin').length})
+                </CardTitle>
+                <CardDescription>
+                  Manage platform administrators
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-4">Name</th>
+                        <th className="text-left p-4">Email</th>
+                        <th className="text-left p-4">Phone</th>
+                        <th className="text-left p-4">Joined</th>
+                        <th className="text-left p-4">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.filter(u => u.role === 'admin').map((userData) => (
+                        <tr key={userData.id} className="border-b hover:bg-muted/50">
+                          <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
+                          <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
+                          <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
+                          <td className="p-4 text-sm text-muted-foreground">
+                            {new Date(userData.created_at).toLocaleDateString()}
+                          </td>
+                          <td className="p-4">
+                            <select
+                              value={userData.role}
+                              onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
+                              className="text-xs border rounded px-2 py-1 bg-background"
+                            >
+                              <option value="user">User</option>
+                              <option value="tenant">Tenant</option>
+                              <option value="landlord">Landlord</option>
+                              <option value="admin">Admin</option>
+                            </select>
+                          </td>
+                        </tr>
+                      ))}
+                      {users.filter(u => u.role === 'admin').length === 0 && (
+                        <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No staff members</td></tr>
+                      )}
                     </tbody>
                   </table>
                 </div>
