@@ -15,13 +15,17 @@ import {
   UserCheck,
   Building,
   Shield,
-  User
+  User,
+  Clock
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { AddUserDialog } from "@/components/admin/AddUserDialog";
+import { AddPropertyDialog } from "@/components/admin/AddPropertyDialog";
+import { ActivityLogs } from "@/components/admin/ActivityLogs";
 
 interface UserData {
   id: string;
@@ -155,8 +159,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const logActivity = async (action: string, entityType: string, entityId?: string, details?: Record<string, string>) => {
+    if (!user) return;
+    try {
+      await supabase.from('activity_logs').insert([{
+        staff_id: user.id,
+        action_type: action,
+        entity_type: entityType,
+        entity_id: entityId || null,
+        details: details as any || null,
+      }]);
+    } catch (error) {
+      console.error('Error logging activity:', error);
+    }
+  };
+
   const updateUserRole = async (userId: string, newRole: string) => {
     try {
+      // Get user info for logging
+      const targetUser = users.find(u => u.user_id === userId);
+      
       // First, remove existing role
       await supabase
         .from('user_roles')
@@ -181,6 +203,13 @@ const AdminDashboard = () => {
         return;
       }
 
+      // Log the activity
+      await logActivity('updated_role', newRole, userId, {
+        email: targetUser?.email || '',
+        full_name: targetUser?.full_name || '',
+        role: newRole,
+      });
+
       toast({
         title: "Success",
         description: "User role updated successfully.",
@@ -196,6 +225,9 @@ const AdminDashboard = () => {
     if (!confirm('Are you sure you want to delete this property?')) return;
 
     try {
+      // Get property info for logging
+      const targetProperty = properties.find(p => p.id === propertyId);
+
       const { error } = await supabase
         .from('properties')
         .delete()
@@ -209,6 +241,12 @@ const AdminDashboard = () => {
         });
         return;
       }
+
+      // Log the activity
+      await logActivity('deleted_property', 'property', propertyId, {
+        title: targetProperty?.title || '',
+        location: targetProperty?.location || '',
+      });
 
       toast({
         title: "Success",
@@ -360,24 +398,28 @@ const AdminDashboard = () => {
 
         {/* Tabs for different views */}
         <Tabs defaultValue="landlords" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="landlords">Landlords</TabsTrigger>
             <TabsTrigger value="tenants">Tenants</TabsTrigger>
             <TabsTrigger value="staff">Staff</TabsTrigger>
             <TabsTrigger value="properties">Properties</TabsTrigger>
+            <TabsTrigger value="activity">Activity</TabsTrigger>
             <TabsTrigger value="payments" onClick={() => navigate('/admin/payments')}>Payments</TabsTrigger>
           </TabsList>
 
           <TabsContent value="landlords" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Building className="h-5 w-5 text-blue-600" />
-                  Landlords ({users.filter(u => u.role === 'landlord').length})
-                </CardTitle>
-                <CardDescription>
-                  Manage registered landlords
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5 text-blue-600" />
+                    Landlords ({users.filter(u => u.role === 'landlord').length})
+                  </CardTitle>
+                  <CardDescription>
+                    Manage registered landlords
+                  </CardDescription>
+                </div>
+                <AddUserDialog defaultRole="landlord" onSuccess={fetchDashboardData} />
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -426,14 +468,17 @@ const AdminDashboard = () => {
 
           <TabsContent value="tenants" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5 text-green-600" />
-                  Tenants ({users.filter(u => u.role === 'tenant').length})
-                </CardTitle>
-                <CardDescription>
-                  Manage registered tenants
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <User className="h-5 w-5 text-green-600" />
+                    Tenants ({users.filter(u => u.role === 'tenant').length})
+                  </CardTitle>
+                  <CardDescription>
+                    Manage registered tenants
+                  </CardDescription>
+                </div>
+                <AddUserDialog defaultRole="tenant" onSuccess={fetchDashboardData} />
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -482,14 +527,17 @@ const AdminDashboard = () => {
 
           <TabsContent value="staff" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-purple-600" />
-                  Staff / Admins ({users.filter(u => u.role === 'admin').length})
-                </CardTitle>
-                <CardDescription>
-                  Manage platform administrators
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-purple-600" />
+                    Staff / Admins ({users.filter(u => u.role === 'admin').length})
+                  </CardTitle>
+                  <CardDescription>
+                    Manage platform administrators
+                  </CardDescription>
+                </div>
+                <AddUserDialog defaultRole="admin" onSuccess={fetchDashboardData} />
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
@@ -538,14 +586,20 @@ const AdminDashboard = () => {
 
           <TabsContent value="properties" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5" />
-                  Properties Management
-                </CardTitle>
-                <CardDescription>
-                  Monitor all property listings and their status
-                </CardDescription>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Home className="h-5 w-5 text-orange-600" />
+                    Properties Management ({properties.length})
+                  </CardTitle>
+                  <CardDescription>
+                    Monitor all property listings and their status
+                  </CardDescription>
+                </div>
+                <AddPropertyDialog 
+                  landlords={users.filter(u => u.role === 'landlord').map(u => ({ user_id: u.user_id, full_name: u.full_name, email: u.email }))} 
+                  onSuccess={fetchDashboardData} 
+                />
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -553,7 +607,7 @@ const AdminDashboard = () => {
                     <Card key={property.id} className="overflow-hidden">
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-4">
-                          <h3 className="font-semibold text-real-estate-navy line-clamp-2">
+                          <h3 className="font-semibold text-foreground line-clamp-2">
                             {property.title}
                           </h3>
                           <Badge className={getStatusColor(property.status)}>
@@ -562,27 +616,27 @@ const AdminDashboard = () => {
                         </div>
                         
                         <div className="space-y-2 mb-4">
-                          <div className="flex items-center gap-1 text-real-estate-gray text-sm">
+                          <div className="flex items-center gap-1 text-muted-foreground text-sm">
                             <MapPin className="h-4 w-4" />
                             <span>{property.location}</span>
                           </div>
-                          <div className="flex items-center gap-1 text-real-estate-gray text-sm">
+                          <div className="flex items-center gap-1 text-muted-foreground text-sm">
                             <Calendar className="h-4 w-4" />
                             <span>{new Date(property.created_at).toLocaleDateString()}</span>
                           </div>
-                          <div className="text-sm text-real-estate-gray">
+                          <div className="text-sm text-muted-foreground">
                             <span className="font-medium">Owner:</span> {property.profiles?.full_name || 'N/A'}
                           </div>
-                          <div className="text-sm text-real-estate-gray">
+                          <div className="text-sm text-muted-foreground">
                             <span className="font-medium">Email:</span> {property.profiles?.email || 'N/A'}
                           </div>
                         </div>
                         
                         <div className="flex items-center justify-between mb-4">
-                          <span className="text-lg font-bold text-real-estate-blue">
+                          <span className="text-lg font-bold text-primary">
                             {formatPrice(property.rent_amount)}/month
                           </span>
-                          <span className="text-sm text-real-estate-gray">
+                          <span className="text-sm text-muted-foreground">
                             {property.bedrooms} bed, {property.bathrooms} bath
                           </span>
                         </div>
@@ -607,6 +661,10 @@ const AdminDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="activity" className="space-y-6">
+            <ActivityLogs />
           </TabsContent>
         </Tabs>
       </div>
