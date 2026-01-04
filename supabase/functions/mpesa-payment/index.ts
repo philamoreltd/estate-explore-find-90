@@ -81,7 +81,7 @@ serve(async (req) => {
     
     const auth = btoa(`${consumerKey}:${consumerSecret}`);
     
-    const authResponse = await fetch("https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
+    const authResponse = await fetch("https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials", {
       method: "GET",
       headers: {
         "Authorization": `Basic ${auth}`,
@@ -123,8 +123,14 @@ serve(async (req) => {
 
     // Initiate STK Push
     const timestamp = new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-    const shortcode = "174379"; // Test shortcode for sandbox
-    const passkey = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919"; // Test passkey
+    const shortcode = Deno.env.get("MPESA_SHORTCODE") ?? "";
+    const passkey = Deno.env.get("MPESA_PASSKEY") ?? "";
+    
+    if (!shortcode || !passkey) {
+      console.error("M-Pesa shortcode or passkey not configured");
+      throw new Error("M-Pesa payment configuration incomplete. Please contact support.");
+    }
+    
     const password = btoa(`${shortcode}${passkey}${timestamp}`);
 
     const stkPushPayload = {
@@ -141,7 +147,7 @@ serve(async (req) => {
       TransactionDesc: "Contact Access Payment",
     };
 
-    const stkResponse = await fetch("https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
+    const stkResponse = await fetch("https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${authData.access_token}`,
