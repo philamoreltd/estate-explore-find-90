@@ -19,6 +19,7 @@ export type Database = {
           amount: number
           checkout_request_id: string | null
           created_at: string
+          expires_at: string | null
           id: string
           payment_status: string
           phone_number: string
@@ -31,6 +32,7 @@ export type Database = {
           amount: number
           checkout_request_id?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           payment_status?: string
           phone_number: string
@@ -43,6 +45,7 @@ export type Database = {
           amount?: number
           checkout_request_id?: string | null
           created_at?: string
+          expires_at?: string | null
           id?: string
           payment_status?: string
           phone_number?: string
