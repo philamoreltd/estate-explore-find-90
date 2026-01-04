@@ -13,16 +13,34 @@ interface PaymentModalProps {
   onClose: () => void;
   propertyId: string;
   propertyTitle: string;
+  rentAmount: number;
   onPaymentSuccess: () => void;
 }
+
+const calculatePaymentAmount = (rentAmount: number): number => {
+  // 6% of the rent amount, minimum KES 10
+  const fee = Math.ceil(rentAmount * 0.06);
+  return Math.max(fee, 10);
+};
+
+const formatPrice = (amount: number): string => {
+  return new Intl.NumberFormat("en-KE", {
+    style: "currency",
+    currency: "KES",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+};
 
 const PaymentModal = ({ 
   isOpen, 
   onClose, 
   propertyId, 
   propertyTitle, 
+  rentAmount,
   onPaymentSuccess 
 }: PaymentModalProps) => {
+  const paymentAmount = calculatePaymentAmount(rentAmount);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const { toast } = useToast();
@@ -66,7 +84,7 @@ const PaymentModal = ({
       const { data, error } = await supabase.functions.invoke("mpesa-payment", {
         body: {
           propertyId,
-          amount: 10, // KES 10 for contact access
+          amount: paymentAmount,
           phoneNumber: phoneNumber.trim(),
         },
       });
@@ -163,9 +181,12 @@ const PaymentModal = ({
         
         <div className="space-y-4">
           <div className="text-center py-4 border rounded-lg bg-muted/50">
-            <h3 className="font-semibold text-lg">KES 10</h3>
+            <h3 className="font-semibold text-lg">{formatPrice(paymentAmount)}</h3>
+            <p className="text-xs text-muted-foreground mb-1">
+              (6% of {formatPrice(rentAmount)} rent)
+            </p>
             <p className="text-sm text-muted-foreground">
-              One-time payment to access landlord contact for:
+              Access landlord contact for 2 weeks:
             </p>
             <p className="font-medium mt-1">{propertyTitle}</p>
           </div>
@@ -208,7 +229,7 @@ const PaymentModal = ({
                     Processing...
                   </>
                 ) : (
-                  "Pay KES 10"
+                  `Pay ${formatPrice(paymentAmount)}`
                 )}
               </Button>
             </div>
@@ -217,7 +238,7 @@ const PaymentModal = ({
           <div className="text-xs text-muted-foreground text-center">
             <p>• Secure payment via Safaricom M-Pesa</p>
             <p>• You will receive an STK push on your phone</p>
-            <p>• Contact access is instant after payment</p>
+            <p>• Contact access valid for 2 weeks after payment</p>
           </div>
         </div>
       </DialogContent>
