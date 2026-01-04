@@ -123,15 +123,19 @@ serve(async (req) => {
 
     // Initiate STK Push
     const timestamp = new Date().toISOString().replace(/[^0-9]/g, "").slice(0, 14);
-    const shortcode = Deno.env.get("MPESA_SHORTCODE") ?? "";
+    const shortcode = Deno.env.get("MPESA_SHORTCODE") ?? ""; // Till Number
     const passkey = Deno.env.get("MPESA_PASSKEY") ?? "";
     
+    // For Buy Goods (Till), we use the Till Number for both BusinessShortCode and PartyB
+    // The passkey should be the one provided by Safaricom for your Till
     if (!shortcode || !passkey) {
       console.error("M-Pesa shortcode or passkey not configured");
       throw new Error("M-Pesa payment configuration incomplete. Please contact support.");
     }
     
     const password = btoa(`${shortcode}${passkey}${timestamp}`);
+
+    console.log("Using shortcode:", shortcode, "for STK Push");
 
     const stkPushPayload = {
       BusinessShortCode: shortcode,
@@ -140,11 +144,11 @@ serve(async (req) => {
       TransactionType: "CustomerBuyGoodsOnline",
       Amount: amount,
       PartyA: formattedPhone,
-      PartyB: shortcode,
+      PartyB: shortcode, // For Till, PartyB is the same as BusinessShortCode
       PhoneNumber: formattedPhone,
       CallBackURL: `${Deno.env.get("SUPABASE_URL")}/functions/v1/mpesa-callback`,
-      AccountReference: paymentRecord.id,
-      TransactionDesc: "Contact Access Payment",
+      AccountReference: paymentRecord.id.substring(0, 12), // Shorten to 12 chars max
+      TransactionDesc: "Contact Access",
     };
 
     const stkResponse = await fetch("https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest", {
