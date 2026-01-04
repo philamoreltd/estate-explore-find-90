@@ -2,9 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import PropertyCard from "./PropertyCard";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowRight, ChevronLeft, ChevronRight, Search, Filter, Target } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { getCurrentLocation, calculateDistance, type LocationData } from "@/utils/location";
 import useEmblaCarousel from "embla-carousel-react";
 
 interface Property {
@@ -23,12 +26,21 @@ interface Property {
   image_urls: string[] | null;
   description: string | null;
   created_at: string;
+  distance?: number;
 }
 
 const FeaturedPropertiesCarousel = () => {
   const navigate = useNavigate();
   const [properties, setProperties] = useState<Property[]>([]);
+  const [filteredProperties, setFilteredProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [maxRent, setMaxRent] = useState("");
+  const [furnishedStatus, setFurnishedStatus] = useState("");
+  const [rentalTerm, setRentalTerm] = useState("");
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+  const [locationLoading, setLocationLoading] = useState(false);
   const { toast } = useToast();
   
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -62,7 +74,11 @@ const FeaturedPropertiesCarousel = () => {
 
   useEffect(() => {
     fetchFeaturedProperties();
-  }, []);
+  }, [userLocation]);
+
+  useEffect(() => {
+    filterProperties();
+  }, [properties, searchTerm, propertyType, maxRent, furnishedStatus, rentalTerm]);
 
   const fetchFeaturedProperties = async () => {
     try {
@@ -82,7 +98,23 @@ const FeaturedPropertiesCarousel = () => {
         return;
       }
 
-      setProperties(data || []);
+      let propertiesWithDistance = data || [];
+      if (userLocation) {
+        propertiesWithDistance = propertiesWithDistance.map(property => ({
+          ...property,
+          distance: property.latitude && property.longitude 
+            ? calculateDistance(
+                userLocation.latitude,
+                userLocation.longitude,
+                property.latitude,
+                property.longitude
+              )
+            : undefined
+        }));
+      }
+
+      setProperties(propertiesWithDistance);
+      setFilteredProperties(propertiesWithDistance);
     } catch (error) {
       console.error('Error fetching properties:', error);
       toast({
@@ -93,6 +125,89 @@ const FeaturedPropertiesCarousel = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getUserLocation = async () => {
+    setLocationLoading(true);
+    try {
+      const location = await getCurrentLocation();
+      setUserLocation(location);
+      toast({
+        title: "Location found",
+        description: "Properties will now show distance from your location",
+      });
+    } catch (error) {
+      toast({
+        title: "Location access failed",
+        description: error instanceof Error ? error.message : "Could not access your location",
+        variant: "destructive",
+      });
+    } finally {
+      setLocationLoading(false);
+    }
+  };
+
+  const filterProperties = () => {
+    let filtered = properties;
+
+    if (searchTerm) {
+      filtered = filtered.filter(property =>
+        property.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        property.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (propertyType && propertyType !== "all") {
+      filtered = filtered.filter(property =>
+        property.property_type.toLowerCase() === propertyType.toLowerCase()
+      );
+    }
+
+    if (maxRent && maxRent !== "all") {
+      const maxRentNumber = parseInt(maxRent);
+      filtered = filtered.filter(property => property.rent_amount <= maxRentNumber);
+    }
+
+    if (furnishedStatus && furnishedStatus !== "all") {
+      if (furnishedStatus === "furnished") {
+        filtered = filtered.filter(property =>
+          property.description?.toLowerCase().includes("furnished") ||
+          property.title.toLowerCase().includes("furnished")
+        );
+      } else if (furnishedStatus === "unfurnished") {
+        filtered = filtered.filter(property =>
+          !property.description?.toLowerCase().includes("furnished") &&
+          !property.title.toLowerCase().includes("furnished")
+        );
+      }
+    }
+
+    if (rentalTerm && rentalTerm !== "all") {
+      if (rentalTerm === "short-term") {
+        filtered = filtered.filter(property =>
+          property.property_type.toLowerCase().includes("bnb") ||
+          property.property_type.toLowerCase().includes("lodging") ||
+          property.description?.toLowerCase().includes("short term") ||
+          property.description?.toLowerCase().includes("weekly") ||
+          property.description?.toLowerCase().includes("daily")
+        );
+      } else if (rentalTerm === "long-term") {
+        filtered = filtered.filter(property =>
+          !property.property_type.toLowerCase().includes("bnb") &&
+          !property.property_type.toLowerCase().includes("lodging")
+        );
+      }
+    }
+
+    setFilteredProperties(filtered);
+  };
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setPropertyType("all");
+    setMaxRent("all");
+    setFurnishedStatus("all");
+    setRentalTerm("all");
   };
 
   const formatPrice = (amount: number) => {
@@ -206,7 +321,7 @@ const FeaturedPropertiesCarousel = () => {
         {/* Carousel */}
         <div className="overflow-hidden" ref={emblaRef}>
           <div className="flex gap-6">
-            {properties.map((property) => (
+            {filteredProperties.map((property) => (
               <div 
                 key={property.id} 
                 className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0"
@@ -228,6 +343,112 @@ const FeaturedPropertiesCarousel = () => {
                 />
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* No Results Message */}
+        {filteredProperties.length === 0 && properties.length > 0 && (
+          <div className="text-center py-8">
+            <p className="text-real-estate-gray">No properties match your filters. Try adjusting your search.</p>
+          </div>
+        )}
+
+        {/* Filters */}
+        <div className="bg-card rounded-xl shadow-card p-6 mt-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="h-5 w-5 text-real-estate-blue" />
+            <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+            {/* Search */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
+              <Input
+                placeholder="Search location or title..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {/* Property Type */}
+            <Select value={propertyType} onValueChange={setPropertyType}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="Property Type" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="apartment">Apartment</SelectItem>
+                <SelectItem value="house">House</SelectItem>
+                <SelectItem value="studio">Studio</SelectItem>
+                <SelectItem value="condo">Condo</SelectItem>
+                <SelectItem value="bnb">BnB</SelectItem>
+                <SelectItem value="lodging">Lodging</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Monthly Rent */}
+            <Select value={maxRent} onValueChange={setMaxRent}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="Max Rent" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">Any Price</SelectItem>
+                <SelectItem value="25000">Up to Ksh 25K</SelectItem>
+                <SelectItem value="50000">Up to Ksh 50K</SelectItem>
+                <SelectItem value="75000">Up to Ksh 75K</SelectItem>
+                <SelectItem value="100000">Up to Ksh 100K</SelectItem>
+                <SelectItem value="150000">Up to Ksh 150K</SelectItem>
+                <SelectItem value="200000">Up to Ksh 200K</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Furnished Status */}
+            <Select value={furnishedStatus} onValueChange={setFurnishedStatus}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="Furnished" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">Any</SelectItem>
+                <SelectItem value="furnished">Furnished</SelectItem>
+                <SelectItem value="unfurnished">Unfurnished</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Rental Term */}
+            <Select value={rentalTerm} onValueChange={setRentalTerm}>
+              <SelectTrigger className="bg-background">
+                <SelectValue placeholder="Rental Term" />
+              </SelectTrigger>
+              <SelectContent className="bg-popover z-50">
+                <SelectItem value="all">Any Term</SelectItem>
+                <SelectItem value="short-term">Short Term</SelectItem>
+                <SelectItem value="long-term">Long Term</SelectItem>
+              </SelectContent>
+            </Select>
+
+            {/* Clear Filters */}
+            <Button 
+              variant="outline" 
+              onClick={clearFilters}
+              className="w-full"
+            >
+              Clear Filters
+            </Button>
+          </div>
+
+          {/* Location Button */}
+          <div className="flex justify-center">
+            <Button 
+              variant="outline" 
+              className="flex items-center gap-2"
+              onClick={getUserLocation}
+              disabled={locationLoading}
+            >
+              <Target className="h-4 w-4" />
+              {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
+            </Button>
           </div>
         </div>
 
