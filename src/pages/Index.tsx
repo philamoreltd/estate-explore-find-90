@@ -1,12 +1,12 @@
 import Navigation from "@/components/Navigation";
-import FeaturedProperties from "@/components/FeaturedProperties";
+import FeaturedPropertiesCarousel from "@/components/FeaturedPropertiesCarousel";
 import StatsSection from "@/components/StatsSection";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
-      <FeaturedProperties />
+      <FeaturedPropertiesCarousel />
       <StatsSection />
       
       {/* Footer */}
