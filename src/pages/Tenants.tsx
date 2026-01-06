@@ -291,16 +291,15 @@ const Tenants = () => {
                     disabled={isLoading}
                   >
                     <option value="">Select property type</option>
+                    <option value="bnb">BnB</option>
                     <option value="bedsitter">Bedsitter</option>
                     <option value="single-room">Single Room</option>
-                    <option value="one-bedroom">One Bedroom</option>
-                    <option value="two-bedroom">Two Bedroom</option>
-                    <option value="three-bedroom">Three Bedroom</option>
-                    <option value="apartment">Apartment</option>
-                    <option value="business-room">Business Room</option>
-                    <option value="office">Office</option>
-                    <option value="lodging">Lodging</option>
-                    <option value="bnb">BNB</option>
+                    <option value="one-bedroom">One-Bedroom</option>
+                    <option value="two-bedroom">Two-Bedroom</option>
+                    <option value="three-bedroom">Three-Bedroom</option>
+                    <option value="maisonette">Maisonette</option>
+                    <option value="bungalow">Bungalow</option>
+                    <option value="compound-house">Compound House</option>
                   </select>
                   {errors.property_type && (
                     <p className="text-sm text-destructive mt-1">{errors.property_type}</p>
