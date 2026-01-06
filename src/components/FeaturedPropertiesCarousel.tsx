@@ -298,7 +298,7 @@ const FeaturedPropertiesCarousel = () => {
               Find Your Dream Home
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-              Discover exceptional rental properties in Kenya's prime locations
+              Discover exceptional rental properties in Kenya
             </p>
           </div>
 
