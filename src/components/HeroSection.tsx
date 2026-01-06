@@ -87,16 +87,15 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
                 onChange={(e) => setPropertyType(e.target.value)}
               >
                 <option value="">Property Type</option>
-                <option value="bedsitter">Bedsitters</option>
-                <option value="single-room">Single Rooms</option>
-                <option value="one-bedroom">One Bedrooms</option>
-                <option value="two-bedroom">Two Bedrooms</option>
-                <option value="three-bedroom">Three Bedrooms</option>
-                <option value="apartment">Apartments</option>
-                <option value="business-room">Business Rooms</option>
-                <option value="office">Offices</option>
-                <option value="lodging">Lodgings</option>
-                <option value="bnb">BNB</option>
+                <option value="bnb">BnB</option>
+                <option value="bedsitter">Bedsitter</option>
+                <option value="single-room">Single Room</option>
+                <option value="one-bedroom">One-Bedroom</option>
+                <option value="two-bedroom">Two-Bedroom</option>
+                <option value="three-bedroom">Three-Bedroom</option>
+                <option value="maisonette">Maisonette</option>
+                <option value="bungalow">Bungalow</option>
+                <option value="compound-house">Compound House</option>
               </select>
               
               <Button variant="search" size="lg" className="h-12" onClick={handleSearch}>

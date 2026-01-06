@@ -321,13 +321,15 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="apartment">Apartment</SelectItem>
-                        <SelectItem value="house">House</SelectItem>
-                        <SelectItem value="condo">Condo</SelectItem>
-                        <SelectItem value="studio">Studio</SelectItem>
-                        <SelectItem value="room">Room</SelectItem>
-                        <SelectItem value="lodging">Lodging</SelectItem>
                         <SelectItem value="bnb">BnB</SelectItem>
+                        <SelectItem value="bedsitter">Bedsitter</SelectItem>
+                        <SelectItem value="single-room">Single Room</SelectItem>
+                        <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
+                        <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
+                        <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
+                        <SelectItem value="maisonette">Maisonette</SelectItem>
+                        <SelectItem value="bungalow">Bungalow</SelectItem>
+                        <SelectItem value="compound-house">Compound House</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

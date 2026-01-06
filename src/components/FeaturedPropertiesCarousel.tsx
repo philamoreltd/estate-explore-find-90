@@ -328,12 +328,15 @@ const FeaturedPropertiesCarousel = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="apartment">Apartment</SelectItem>
-                  <SelectItem value="house">House</SelectItem>
-                  <SelectItem value="studio">Studio</SelectItem>
-                  <SelectItem value="condo">Condo</SelectItem>
                   <SelectItem value="bnb">BnB</SelectItem>
-                  <SelectItem value="lodging">Lodging</SelectItem>
+                  <SelectItem value="bedsitter">Bedsitter</SelectItem>
+                  <SelectItem value="single-room">Single Room</SelectItem>
+                  <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
+                  <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
+                  <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
+                  <SelectItem value="maisonette">Maisonette</SelectItem>
+                  <SelectItem value="bungalow">Bungalow</SelectItem>
+                  <SelectItem value="compound-house">Compound House</SelectItem>
                 </SelectContent>
               </Select>
 
