@@ -53,7 +53,7 @@ const Index = () => {
           </div>
           
           <div className="border-t border-white/20 mt-8 pt-8 text-center text-sm text-white/80">
-            <p>&copy; 2025 Housevilla. All rights reserved.</p>
+            <p>&copy; 2026 Housevilla. All rights reserved.</p>
           </div>
         </div>
       </footer>
