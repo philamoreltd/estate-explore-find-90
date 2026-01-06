@@ -282,189 +282,213 @@ const FeaturedPropertiesCarousel = () => {
   }
 
   return (
-    <section className="py-16 bg-gradient-subtle">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-real-estate-navy mb-2">
-              Featured Rentals
-            </h2>
-            <p className="text-lg text-real-estate-gray">
-              Handpicked properties in prime locations
+    <>
+      {/* Hero Filter Section with House Background */}
+      <section 
+        className="relative py-20 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('/hero-house.jpg')` }}
+      >
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Hero Text */}
+          <div className="text-center mb-10">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
+              Find Your Dream Home
+            </h1>
+            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
+              Discover exceptional rental properties in Kenya's prime locations
             </p>
           </div>
-          
-          {/* Navigation Arrows */}
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={scrollPrev}
-              disabled={!canScrollPrev}
-              className="rounded-full border-real-estate-blue text-real-estate-blue hover:bg-real-estate-blue hover:text-white disabled:opacity-50"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={scrollNext}
-              disabled={!canScrollNext}
-              className="rounded-full border-real-estate-blue text-real-estate-blue hover:bg-real-estate-blue hover:text-white disabled:opacity-50"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
 
-        {/* Carousel */}
-        <div className="overflow-hidden" ref={emblaRef}>
-          <div className="flex gap-6">
-            {filteredProperties.map((property) => (
-              <div 
-                key={property.id} 
-                className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0"
-              >
-                <PropertyCard
-                  id={property.id}
-                  image={getPropertyImage(property)}
-                  imageUrls={property.image_urls}
-                  price={formatPrice(property.rent_amount)}
-                  address={property.title}
-                  city={property.location}
-                  beds={property.bedrooms}
-                  baths={property.bathrooms}
-                  sqft={property.size_sqft || 1000}
-                  type="For Rent"
-                  isNew={isNewProperty(property.created_at)}
-                  landlordId={property.user_id}
-                  contact={(property as any).contact}
+          {/* Filters */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8">
+            <div className="flex items-center gap-2 mb-6">
+              <Filter className="h-5 w-5 text-real-estate-blue" />
+              <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+              {/* Search */}
+              <div className="relative lg:col-span-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
+                <Input
+                  placeholder="Search location or title..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-white border-gray-200"
                 />
               </div>
-            ))}
-          </div>
-        </div>
 
-        {/* No Results Message */}
-        {filteredProperties.length === 0 && properties.length > 0 && (
-          <div className="text-center py-8">
-            <p className="text-real-estate-gray">No properties match your filters. Try adjusting your search.</p>
-          </div>
-        )}
+              {/* Property Type */}
+              <Select value={propertyType} onValueChange={setPropertyType}>
+                <SelectTrigger className="bg-white border-gray-200">
+                  <SelectValue placeholder="Property Type" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="apartment">Apartment</SelectItem>
+                  <SelectItem value="house">House</SelectItem>
+                  <SelectItem value="studio">Studio</SelectItem>
+                  <SelectItem value="condo">Condo</SelectItem>
+                  <SelectItem value="bnb">BnB</SelectItem>
+                  <SelectItem value="lodging">Lodging</SelectItem>
+                </SelectContent>
+              </Select>
 
-        {/* Filters */}
-        <div className="bg-card rounded-xl shadow-card p-6 mt-8">
-          <div className="flex items-center gap-2 mb-4">
-            <Filter className="h-5 w-5 text-real-estate-blue" />
-            <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
-              <Input
-                placeholder="Search location or title..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+              {/* Monthly Rent */}
+              <Select value={maxRent} onValueChange={setMaxRent}>
+                <SelectTrigger className="bg-white border-gray-200">
+                  <SelectValue placeholder="Max Rent" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">Any Price</SelectItem>
+                  <SelectItem value="25000">Up to Ksh 25K</SelectItem>
+                  <SelectItem value="50000">Up to Ksh 50K</SelectItem>
+                  <SelectItem value="75000">Up to Ksh 75K</SelectItem>
+                  <SelectItem value="100000">Up to Ksh 100K</SelectItem>
+                  <SelectItem value="150000">Up to Ksh 150K</SelectItem>
+                  <SelectItem value="200000">Up to Ksh 200K</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Furnished Status */}
+              <Select value={furnishedStatus} onValueChange={setFurnishedStatus}>
+                <SelectTrigger className="bg-white border-gray-200">
+                  <SelectValue placeholder="Furnished" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="furnished">Furnished</SelectItem>
+                  <SelectItem value="unfurnished">Unfurnished</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Rental Term */}
+              <Select value={rentalTerm} onValueChange={setRentalTerm}>
+                <SelectTrigger className="bg-white border-gray-200">
+                  <SelectValue placeholder="Rental Term" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">Any Term</SelectItem>
+                  <SelectItem value="short-term">Short Term</SelectItem>
+                  <SelectItem value="long-term">Long Term</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Clear Filters */}
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="w-full bg-white hover:bg-gray-50"
+              >
+                Clear Filters
+              </Button>
             </div>
 
-            {/* Property Type */}
-            <Select value={propertyType} onValueChange={setPropertyType}>
-              <SelectTrigger className="bg-background">
-                <SelectValue placeholder="Property Type" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="apartment">Apartment</SelectItem>
-                <SelectItem value="house">House</SelectItem>
-                <SelectItem value="studio">Studio</SelectItem>
-                <SelectItem value="condo">Condo</SelectItem>
-                <SelectItem value="bnb">BnB</SelectItem>
-                <SelectItem value="lodging">Lodging</SelectItem>
-              </SelectContent>
-            </Select>
+            {/* Location Button */}
+            <div className="flex justify-center pt-2">
+              <Button 
+                variant="default" 
+                className="flex items-center gap-2 bg-real-estate-blue hover:bg-real-estate-blue/90"
+                onClick={getUserLocation}
+                disabled={locationLoading}
+              >
+                <Target className="h-4 w-4" />
+                {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
 
-            {/* Monthly Rent */}
-            <Select value={maxRent} onValueChange={setMaxRent}>
-              <SelectTrigger className="bg-background">
-                <SelectValue placeholder="Max Rent" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="all">Any Price</SelectItem>
-                <SelectItem value="25000">Up to Ksh 25K</SelectItem>
-                <SelectItem value="50000">Up to Ksh 50K</SelectItem>
-                <SelectItem value="75000">Up to Ksh 75K</SelectItem>
-                <SelectItem value="100000">Up to Ksh 100K</SelectItem>
-                <SelectItem value="150000">Up to Ksh 150K</SelectItem>
-                <SelectItem value="200000">Up to Ksh 200K</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Furnished Status */}
-            <Select value={furnishedStatus} onValueChange={setFurnishedStatus}>
-              <SelectTrigger className="bg-background">
-                <SelectValue placeholder="Furnished" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="all">Any</SelectItem>
-                <SelectItem value="furnished">Furnished</SelectItem>
-                <SelectItem value="unfurnished">Unfurnished</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Rental Term */}
-            <Select value={rentalTerm} onValueChange={setRentalTerm}>
-              <SelectTrigger className="bg-background">
-                <SelectValue placeholder="Rental Term" />
-              </SelectTrigger>
-              <SelectContent className="bg-popover z-50">
-                <SelectItem value="all">Any Term</SelectItem>
-                <SelectItem value="short-term">Short Term</SelectItem>
-                <SelectItem value="long-term">Long Term</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Clear Filters */}
-            <Button 
-              variant="outline" 
-              onClick={clearFilters}
-              className="w-full"
-            >
-              Clear Filters
-            </Button>
+      {/* Featured Rentals Section */}
+      <section className="py-16 bg-gradient-subtle">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-real-estate-navy mb-2">
+                Featured Rentals
+              </h2>
+              <p className="text-lg text-real-estate-gray">
+                Handpicked properties in prime locations
+              </p>
+            </div>
+            
+            {/* Navigation Arrows */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={scrollPrev}
+                disabled={!canScrollPrev}
+                className="rounded-full border-real-estate-blue text-real-estate-blue hover:bg-real-estate-blue hover:text-white disabled:opacity-50"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={scrollNext}
+                disabled={!canScrollNext}
+                className="rounded-full border-real-estate-blue text-real-estate-blue hover:bg-real-estate-blue hover:text-white disabled:opacity-50"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </Button>
+            </div>
           </div>
 
-          {/* Location Button */}
-          <div className="flex justify-center">
+          {/* Carousel */}
+          <div className="overflow-hidden" ref={emblaRef}>
+            <div className="flex gap-6">
+              {filteredProperties.map((property) => (
+                <div 
+                  key={property.id} 
+                  className="flex-[0_0_100%] sm:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0"
+                >
+                  <PropertyCard
+                    id={property.id}
+                    image={getPropertyImage(property)}
+                    imageUrls={property.image_urls}
+                    price={formatPrice(property.rent_amount)}
+                    address={property.title}
+                    city={property.location}
+                    beds={property.bedrooms}
+                    baths={property.bathrooms}
+                    sqft={property.size_sqft || 1000}
+                    type="For Rent"
+                    isNew={isNewProperty(property.created_at)}
+                    landlordId={property.user_id}
+                    contact={(property as any).contact}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* No Results Message */}
+          {filteredProperties.length === 0 && properties.length > 0 && (
+            <div className="text-center py-8">
+              <p className="text-real-estate-gray">No properties match your filters. Try adjusting your search.</p>
+            </div>
+          )}
+
+          {/* View All Button */}
+          <div className="text-center mt-12">
             <Button 
-              variant="outline" 
-              className="flex items-center gap-2"
-              onClick={getUserLocation}
-              disabled={locationLoading}
+              variant="hero" 
+              size="lg"
+              onClick={() => navigate('/browse')}
             >
-              <Target className="h-4 w-4" />
-              {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
+              View All Rentals
+              <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
           </div>
         </div>
-
-        {/* View All Button */}
-        <div className="text-center mt-12">
-          <Button 
-            variant="hero" 
-            size="lg"
-            onClick={() => navigate('/browse')}
-          >
-            View All Rentals
-            <ArrowRight className="h-5 w-5 ml-2" />
-          </Button>
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
