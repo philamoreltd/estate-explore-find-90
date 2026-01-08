@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Home, Search, Heart, User, Menu, LogOut, X } from "lucide-react";
+import { Heart, User, Menu, LogOut, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import housevillaLogo from "@/assets/housevilla-logo.png";
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -40,7 +41,7 @@ const Navigation = () => {
           {/* Logo */}
           <div className="flex items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Home className="h-8 w-8 text-real-estate-blue mr-2" />
+              <img src={housevillaLogo} alt="Housevilla" className="h-10 w-10 mr-2" />
               <span className="text-xl font-bold text-foreground">Housevilla</span>
             </div>
           </div>
