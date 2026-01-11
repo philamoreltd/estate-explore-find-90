@@ -11,7 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Upload, X, Phone } from "lucide-react";
+import { Loader2, Upload, X, Phone, MapPin } from "lucide-react";
+import { getCurrentLocation } from "@/utils/location";
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -24,6 +25,8 @@ const propertySchema = z.object({
   size_sqft: z.number().optional(),
   description: z.string().optional(),
   status: z.string().min(1, "Status is required"),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -38,6 +41,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   const { user } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
@@ -54,6 +58,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
       size_sqft: undefined,
       description: "",
       status: "available",
+      latitude: undefined,
+      longitude: undefined,
     },
   });
 
@@ -94,6 +100,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         size_sqft: data.size_sqft || undefined,
         description: data.description || "",
         status: data.status,
+        latitude: data.latitude ? Number(data.latitude) : undefined,
+        longitude: data.longitude ? Number(data.longitude) : undefined,
       });
 
       if (data.image_urls && data.image_urls.length > 0) {
@@ -183,8 +191,10 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         description: data.description || null,
         status: data.status,
         user_id: user.id,
-        image_url: imageUrls[0] || null, // First image as primary
+        image_url: imageUrls[0] || null,
         image_urls: imageUrls.length > 0 ? imageUrls : null,
+        latitude: data.latitude || null,
+        longitude: data.longitude || null,
       };
 
       let result;
@@ -413,6 +423,94 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                   </FormItem>
                 )}
               />
+
+              {/* GPS Coordinates Section */}
+              <div className="md:col-span-2 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-medium">GPS Coordinates</label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={async () => {
+                      setIsGettingLocation(true);
+                      try {
+                        const location = await getCurrentLocation();
+                        form.setValue('latitude', location.latitude);
+                        form.setValue('longitude', location.longitude);
+                        toast({
+                          title: "Location captured",
+                          description: `Lat: ${location.latitude.toFixed(6)}, Lng: ${location.longitude.toFixed(6)}`,
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Location error",
+                          description: error instanceof Error ? error.message : "Failed to get location",
+                          variant: "destructive",
+                        });
+                      } finally {
+                        setIsGettingLocation(false);
+                      }
+                    }}
+                    disabled={isGettingLocation}
+                  >
+                    {isGettingLocation ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <MapPin className="h-4 w-4 mr-2" />
+                    )}
+                    Use My Location
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <FormField
+                    control={form.control}
+                    name="latitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs text-muted-foreground">Latitude</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="-1.2921"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="longitude"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs text-muted-foreground">Longitude</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="36.8219"
+                            {...field}
+                            value={field.value ?? ''}
+                            onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                {form.watch('latitude') && form.watch('longitude') && (
+                  <p className="text-xs text-muted-foreground flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    Coordinates set: {form.watch('latitude')?.toFixed(6)}, {form.watch('longitude')?.toFixed(6)}
+                  </p>
+                )}
+              </div>
 
               <FormField
                 control={form.control}
