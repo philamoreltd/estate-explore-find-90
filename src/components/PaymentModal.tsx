@@ -18,8 +18,8 @@ interface PaymentModalProps {
 }
 
 const calculatePaymentAmount = (rentAmount: number): number => {
-  // 6% of the rent amount, minimum KES 10
-  const fee = Math.ceil(rentAmount * 0.06);
+  // 4% of the rent amount, minimum KES 10
+  const fee = Math.ceil(rentAmount * 0.04);
   return Math.max(fee, 10);
 };
 
