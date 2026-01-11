@@ -184,6 +184,11 @@ const PropertyDetails = () => {
     }).format(amount);
   };
 
+  const calculateContactFee = (rentAmount: number) => {
+    const fee = Math.round(rentAmount * 0.06);
+    return Math.max(fee, 10);
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -438,7 +443,7 @@ const PropertyDetails = () => {
                       onClick={() => setShowPaymentModal(true)}
                     >
                       <Phone className="h-4 w-4 mr-2" />
-                      Pay KES 100 to view contact
+                      Pay KES {calculateContactFee(property.rent_amount).toLocaleString()} to view contact
                     </Button>
                   ) : property.phone ? (
                     <Button 
