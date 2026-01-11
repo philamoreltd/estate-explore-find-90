@@ -329,13 +329,9 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
                         description: `Lat: ${location.latitude.toFixed(6)}, Lng: ${location.longitude.toFixed(6)}`,
                       });
                     } catch (error) {
-                      const errorMessage = error instanceof Error ? error.message : "Failed to get location";
                       toast({
                         title: "Could not get location",
-                        description: errorMessage.includes("denied") 
-                          ? "Please allow location access in your browser settings and try again."
-                          : errorMessage,
-                        variant: "destructive",
+                        description: "GPS unavailable. You can manually enter the coordinates below.",
                       });
                     } finally {
                       setIsGettingLocation(false);
