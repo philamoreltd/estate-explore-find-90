@@ -182,9 +182,6 @@ const PaymentModal = ({
         <div className="space-y-4">
           <div className="text-center py-4 border rounded-lg bg-muted/50">
             <h3 className="font-semibold text-lg">{formatPrice(paymentAmount)}</h3>
-            <p className="text-xs text-muted-foreground mb-1">
-              (6% of {formatPrice(rentAmount)} rent)
-            </p>
             <p className="text-sm text-muted-foreground">
               Access landlord contact for 2 weeks:
             </p>
