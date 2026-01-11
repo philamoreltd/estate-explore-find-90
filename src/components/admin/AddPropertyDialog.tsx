@@ -8,7 +8,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, Plus, Upload, X } from "lucide-react";
+import { Loader2, Plus, Upload, X, MapPin } from "lucide-react";
+import { getCurrentLocation } from "@/utils/location";
 
 interface UserOption {
   user_id: string;
@@ -26,6 +27,7 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [formData, setFormData] = useState({
@@ -40,6 +42,8 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
     size_sqft: "",
     description: "",
     status: "available",
+    latitude: "",
+    longitude: "",
   });
 
   const logActivity = async (action: string, entityType: string, entityId?: string, details?: Record<string, string>) => {
@@ -128,6 +132,8 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
         status: formData.status,
         image_url: imageUrls[0] || null,
         image_urls: imageUrls.length > 0 ? imageUrls : null,
+        latitude: formData.latitude ? Number(formData.latitude) : null,
+        longitude: formData.longitude ? Number(formData.longitude) : null,
       };
 
       const { data, error } = await supabase
@@ -171,6 +177,8 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
         size_sqft: "",
         description: "",
         status: "available",
+        latitude: "",
+        longitude: "",
       });
       setImageFiles([]);
       setImagePreviews([]);
@@ -297,6 +305,77 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
             <div className="col-span-2 space-y-2">
               <Label>Location *</Label>
               <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="e.g., Nairobi, Kenya" required />
+            </div>
+            
+            {/* GPS Coordinates Section */}
+            <div className="col-span-2 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label>GPS Coordinates</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    setIsGettingLocation(true);
+                    try {
+                      const location = await getCurrentLocation();
+                      setFormData(prev => ({
+                        ...prev,
+                        latitude: location.latitude.toString(),
+                        longitude: location.longitude.toString(),
+                      }));
+                      toast({
+                        title: "Location captured",
+                        description: `Lat: ${location.latitude.toFixed(6)}, Lng: ${location.longitude.toFixed(6)}`,
+                      });
+                    } catch (error) {
+                      toast({
+                        title: "Location error",
+                        description: error instanceof Error ? error.message : "Failed to get location",
+                        variant: "destructive",
+                      });
+                    } finally {
+                      setIsGettingLocation(false);
+                    }
+                  }}
+                  disabled={isGettingLocation}
+                >
+                  {isGettingLocation ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <MapPin className="h-4 w-4 mr-2" />
+                  )}
+                  Use My Location
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Latitude</Label>
+                  <Input
+                    type="number"
+                    step="any"
+                    value={formData.latitude}
+                    onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
+                    placeholder="-1.2921"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Longitude</Label>
+                  <Input
+                    type="number"
+                    step="any"
+                    value={formData.longitude}
+                    onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
+                    placeholder="36.8219"
+                  />
+                </div>
+              </div>
+              {formData.latitude && formData.longitude && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  Coordinates set: {Number(formData.latitude).toFixed(6)}, {Number(formData.longitude).toFixed(6)}
+                </p>
+              )}
             </div>
             <div className="space-y-2">
               <Label>Bedrooms</Label>
