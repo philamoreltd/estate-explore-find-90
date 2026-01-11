@@ -110,7 +110,7 @@ serve(async (req) => {
           day: "numeric",
         });
 
-        const renewalFee = Math.max(Math.ceil(Number(property.rent_amount) * 0.06), 10);
+        const renewalFee = Math.max(Math.ceil(Number(property.rent_amount) * 0.04), 10);
 
         console.log(`Sending reminder to ${profile.email} for property: ${property.title}`);
 
