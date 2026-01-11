@@ -446,10 +446,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                         const errorMessage = error instanceof Error ? error.message : "Failed to get location";
                         toast({
                           title: "Could not get location",
-                          description: errorMessage.includes("denied") 
-                            ? "Please allow location access in your browser settings and try again."
-                            : errorMessage,
-                          variant: "destructive",
+                          description: "GPS unavailable. You can manually enter the coordinates below.",
                         });
                       } finally {
                         setIsGettingLocation(false);
