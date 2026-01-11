@@ -196,7 +196,7 @@ const PropertyDetails = () => {
   };
 
   const calculateContactFee = (rentAmount: number) => {
-    const fee = Math.round(rentAmount * 0.06);
+    const fee = Math.round(rentAmount * 0.04);
     return Math.max(fee, 10);
   };
 
