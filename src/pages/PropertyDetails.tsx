@@ -443,7 +443,7 @@ const PropertyDetails = () => {
                       onClick={() => setShowPaymentModal(true)}
                     >
                       <Phone className="h-4 w-4 mr-2" />
-                      Pay KES {calculateContactFee(property.rent_amount).toLocaleString()} to view contact
+                      Pay KES {calculateContactFee(property.rent_amount).toLocaleString()} for 2 weeks access
                     </Button>
                   ) : property.phone ? (
                     <Button 
