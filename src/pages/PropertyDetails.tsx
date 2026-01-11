@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, User, Phone, Mail, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, MapPin, Bed, Bath, Square, Calendar, User, Phone, Mail, ChevronLeft, ChevronRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,7 @@ const PropertyDetails = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [hasPaidForContact, setHasPaidForContact] = useState(false);
+  const [accessExpiresAt, setAccessExpiresAt] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -105,7 +106,7 @@ const PropertyDetails = () => {
     try {
       const { data, error } = await supabase
         .from('contact_payments')
-        .select('payment_status')
+        .select('payment_status, expires_at')
         .eq('user_id', user.id)
         .eq('property_id', propertyId)
         .eq('payment_status', 'completed')
@@ -113,10 +114,20 @@ const PropertyDetails = () => {
 
       if (!error && data) {
         setHasPaidForContact(true);
+        setAccessExpiresAt(data.expires_at);
       }
     } catch (error) {
       console.error('Error checking payment status:', error);
     }
+  };
+
+  const calculateDaysRemaining = (expiresAt: string | null): number | null => {
+    if (!expiresAt) return null;
+    const now = new Date();
+    const expiry = new Date(expiresAt);
+    const diffTime = expiry.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays > 0 ? diffDays : 0;
   };
 
   const fetchLandlordProfile = async (userId: string) => {
@@ -446,14 +457,27 @@ const PropertyDetails = () => {
                       Pay KES {calculateContactFee(property.rent_amount).toLocaleString()} for 2 weeks access
                     </Button>
                   ) : property.phone ? (
-                    <Button 
-                      className="w-full" 
-                      size="lg"
-                      onClick={() => window.open(`tel:${property.phone}`, '_self')}
-                    >
-                      <Phone className="h-4 w-4 mr-2" />
-                      Call {property.phone}
-                    </Button>
+                    <>
+                      <Button 
+                        className="w-full" 
+                        size="lg"
+                        onClick={() => window.open(`tel:${property.phone}`, '_self')}
+                      >
+                        <Phone className="h-4 w-4 mr-2" />
+                        Call {property.phone}
+                      </Button>
+                      {accessExpiresAt && (
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 rounded-lg py-2 px-3">
+                          <Clock className="h-4 w-4" />
+                          <span>
+                            {calculateDaysRemaining(accessExpiresAt) === 0 
+                              ? "Access expires today" 
+                              : `${calculateDaysRemaining(accessExpiresAt)} day${calculateDaysRemaining(accessExpiresAt) === 1 ? '' : 's'} of access remaining`
+                            }
+                          </span>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <Button 
                       className="w-full" 
