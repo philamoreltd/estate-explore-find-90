@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,14 +29,17 @@ const Auth = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  
+  const returnUrl = searchParams.get('returnUrl') || '/';
 
-  // Redirect to home if user is already logged in
+  // Redirect to return URL if user is already logged in
   useEffect(() => {
     if (!authLoading && user) {
-      navigate("/");
+      navigate(returnUrl);
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, navigate, returnUrl]);
 
   const validateSignUp = () => {
     const newErrors: { [key: string]: string } = {};
@@ -174,7 +177,7 @@ const Auth = () => {
         description: "You have been successfully signed in.",
       });
       
-      navigate("/");
+      navigate(returnUrl);
       
     } catch (error: any) {
       console.error("Sign in error:", error);
