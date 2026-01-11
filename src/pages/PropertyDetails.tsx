@@ -426,7 +426,7 @@ const PropertyDetails = () => {
                       className="w-full" 
                       size="lg"
                       variant="outline"
-                      onClick={() => navigate('/auth')}
+                      onClick={() => navigate(`/auth?returnUrl=${encodeURIComponent(`/property/${id}`)}`)}
                     >
                       <Phone className="h-4 w-4 mr-2" />
                       Sign in to view contact
@@ -474,7 +474,7 @@ const PropertyDetails = () => {
                     variant="outline" 
                     className="w-full" 
                     size="lg"
-                    onClick={() => user ? setShowContactModal(true) : navigate('/auth')}
+                    onClick={() => user ? setShowContactModal(true) : navigate(`/auth?returnUrl=${encodeURIComponent(`/property/${id}`)}`)}
                   >
                     <Mail className="h-4 w-4 mr-2" />
                     {user ? "Send Message" : "Sign in to Message"}
