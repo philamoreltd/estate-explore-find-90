@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Home, Eye, Edit, Trash2, MapPin, Bed, Bath } from "lucide-react";
+import { Plus, Home, Eye, Edit, MapPin, Bed, Bath } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,35 +64,6 @@ const Landlords = () => {
     }
   };
 
-  const handleDeleteProperty = async (propertyId: string) => {
-    if (!confirm('Are you sure you want to delete this property?')) return;
-
-    try {
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', propertyId);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete property. Please try again.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      toast({
-        title: "Success",
-        description: "Property deleted successfully.",
-      });
-
-      // Remove from local state
-      setProperties(prev => prev.filter(p => p.id !== propertyId));
-    } catch (error) {
-      console.error('Error deleting property:', error);
-    }
-  };
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {
@@ -105,8 +76,8 @@ const Landlords = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'available': return 'bg-green-100 text-green-800';
+      case 'occupied': return 'bg-blue-100 text-blue-800';
       case 'rented': return 'bg-blue-100 text-blue-800';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -289,15 +260,7 @@ const Landlords = () => {
                       onClick={() => navigate(`/edit-property/${property.id}`)}
                     >
                       <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button 
-                      size="sm" 
-                      variant="outline" 
-                      onClick={() => handleDeleteProperty(property.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-4 w-4" />
+                      Edit Status
                     </Button>
                   </div>
                 </CardContent>

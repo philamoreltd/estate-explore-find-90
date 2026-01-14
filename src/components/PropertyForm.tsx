@@ -361,8 +361,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="available">Available</SelectItem>
-                        <SelectItem value="rented">Rented</SelectItem>
-                        <SelectItem value="maintenance">Under Maintenance</SelectItem>
+                        <SelectItem value="occupied">Occupied</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
