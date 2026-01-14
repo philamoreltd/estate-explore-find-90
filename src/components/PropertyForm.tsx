@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -8,6 +8,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
@@ -44,6 +54,9 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [showStatusConfirmDialog, setShowStatusConfirmDialog] = useState(false);
+  const [pendingFormData, setPendingFormData] = useState<PropertyFormData | null>(null);
+  const originalStatusRef = useRef<string>("available");
 
   const form = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
@@ -88,6 +101,9 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         });
         return;
       }
+
+      // Store original status for comparison
+      originalStatusRef.current = data.status;
 
       form.reset({
         title: data.title,
@@ -158,7 +174,19 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
     return uploadedUrls;
   };
 
-  const onSubmit = async (data: PropertyFormData) => {
+  const handleFormSubmit = (data: PropertyFormData) => {
+    // Check if status is changing from available to occupied (when editing)
+    if (propertyId && originalStatusRef.current === 'available' && data.status === 'occupied') {
+      setPendingFormData(data);
+      setShowStatusConfirmDialog(true);
+      return;
+    }
+    
+    // Otherwise proceed with submission
+    processSubmit(data);
+  };
+
+  const processSubmit = async (data: PropertyFormData) => {
     if (!user) {
       toast({
         title: "Error",
@@ -239,7 +267,21 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
     }
   };
 
+  const handleConfirmStatusChange = () => {
+    if (pendingFormData) {
+      processSubmit(pendingFormData);
+    }
+    setShowStatusConfirmDialog(false);
+    setPendingFormData(null);
+  };
+
+  const handleCancelStatusChange = () => {
+    setShowStatusConfirmDialog(false);
+    setPendingFormData(null);
+  };
+
   return (
+    <>
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>
@@ -248,7 +290,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
             {/* Image Upload */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Property Images</label>
@@ -600,6 +642,26 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
         </Form>
       </CardContent>
     </Card>
+
+      {/* Status Change Confirmation Dialog */}
+      <AlertDialog open={showStatusConfirmDialog} onOpenChange={setShowStatusConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Mark Property as Occupied?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are about to mark this property as occupied. This will remove it from the available listings. 
+              Are you sure you want to continue?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelStatusChange}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmStatusChange}>
+              Yes, Mark as Occupied
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
