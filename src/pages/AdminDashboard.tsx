@@ -36,6 +36,7 @@ interface UserData {
   phone: string;
   created_at: string;
   role?: string;
+  is_active?: boolean;
 }
 
 interface Property {
@@ -219,6 +220,46 @@ const AdminDashboard = () => {
       fetchDashboardData();
     } catch (error) {
       console.error('Error updating user role:', error);
+    }
+  };
+
+  const toggleUserActive = async (userId: string, currentStatus: boolean) => {
+    try {
+      const targetUser = users.find(u => u.user_id === userId);
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !currentStatus })
+        .eq('user_id', userId);
+
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to update user status.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Log the activity
+      await logActivity(
+        currentStatus ? 'deactivated_user' : 'activated_user', 
+        'user', 
+        userId, 
+        {
+          email: targetUser?.email || '',
+          full_name: targetUser?.full_name || '',
+        }
+      );
+
+      toast({
+        title: "Success",
+        description: `User ${currentStatus ? 'deactivated' : 'activated'} successfully.`,
+      });
+
+      fetchDashboardData();
+    } catch (error) {
+      console.error('Error updating user status:', error);
     }
   };
 
@@ -430,7 +471,9 @@ const AdminDashboard = () => {
                         <th className="text-left p-4">Name</th>
                         <th className="text-left p-4">Email</th>
                         <th className="text-left p-4">Phone</th>
+                        <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Joined</th>
+                        <th className="text-left p-4">Role</th>
                         <th className="text-left p-4">Actions</th>
                       </tr>
                     </thead>
@@ -440,6 +483,11 @@ const AdminDashboard = () => {
                           <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
                           <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
                           <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
+                          <td className="p-4">
+                            <Badge className={userData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {userData.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </td>
                           <td className="p-4 text-sm text-muted-foreground">
                             {new Date(userData.created_at).toLocaleDateString()}
                           </td>
@@ -455,10 +503,20 @@ const AdminDashboard = () => {
                               <option value="admin">Admin</option>
                             </select>
                           </td>
+                          <td className="p-4">
+                            <Button
+                              size="sm"
+                              variant={userData.is_active ? "outline" : "default"}
+                              onClick={() => toggleUserActive(userData.user_id, userData.is_active || false)}
+                              className={userData.is_active ? "text-destructive hover:text-destructive" : ""}
+                            >
+                              {userData.is_active ? 'Deactivate' : 'Activate'}
+                            </Button>
+                          </td>
                         </tr>
                       ))}
                       {users.filter(u => u.role === 'landlord').length === 0 && (
-                        <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No landlords registered</td></tr>
+                        <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No landlords registered</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -489,7 +547,9 @@ const AdminDashboard = () => {
                         <th className="text-left p-4">Name</th>
                         <th className="text-left p-4">Email</th>
                         <th className="text-left p-4">Phone</th>
+                        <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Joined</th>
+                        <th className="text-left p-4">Role</th>
                         <th className="text-left p-4">Actions</th>
                       </tr>
                     </thead>
@@ -499,6 +559,11 @@ const AdminDashboard = () => {
                           <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
                           <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
                           <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
+                          <td className="p-4">
+                            <Badge className={userData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {userData.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </td>
                           <td className="p-4 text-sm text-muted-foreground">
                             {new Date(userData.created_at).toLocaleDateString()}
                           </td>
@@ -514,10 +579,20 @@ const AdminDashboard = () => {
                               <option value="admin">Admin</option>
                             </select>
                           </td>
+                          <td className="p-4">
+                            <Button
+                              size="sm"
+                              variant={userData.is_active ? "outline" : "default"}
+                              onClick={() => toggleUserActive(userData.user_id, userData.is_active || false)}
+                              className={userData.is_active ? "text-destructive hover:text-destructive" : ""}
+                            >
+                              {userData.is_active ? 'Deactivate' : 'Activate'}
+                            </Button>
+                          </td>
                         </tr>
                       ))}
                       {users.filter(u => u.role === 'tenant').length === 0 && (
-                        <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No tenants registered</td></tr>
+                        <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No tenants registered</td></tr>
                       )}
                     </tbody>
                   </table>
@@ -548,7 +623,9 @@ const AdminDashboard = () => {
                         <th className="text-left p-4">Name</th>
                         <th className="text-left p-4">Email</th>
                         <th className="text-left p-4">Phone</th>
+                        <th className="text-left p-4">Status</th>
                         <th className="text-left p-4">Joined</th>
+                        <th className="text-left p-4">Role</th>
                         <th className="text-left p-4">Actions</th>
                       </tr>
                     </thead>
@@ -558,6 +635,11 @@ const AdminDashboard = () => {
                           <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
                           <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
                           <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
+                          <td className="p-4">
+                            <Badge className={userData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
+                              {userData.is_active ? 'Active' : 'Inactive'}
+                            </Badge>
+                          </td>
                           <td className="p-4 text-sm text-muted-foreground">
                             {new Date(userData.created_at).toLocaleDateString()}
                           </td>
@@ -573,10 +655,20 @@ const AdminDashboard = () => {
                               <option value="admin">Admin</option>
                             </select>
                           </td>
+                          <td className="p-4">
+                            <Button
+                              size="sm"
+                              variant={userData.is_active ? "outline" : "default"}
+                              onClick={() => toggleUserActive(userData.user_id, userData.is_active || false)}
+                              className={userData.is_active ? "text-destructive hover:text-destructive" : ""}
+                            >
+                              {userData.is_active ? 'Deactivate' : 'Activate'}
+                            </Button>
+                          </td>
                         </tr>
                       ))}
                       {users.filter(u => u.role === 'admin').length === 0 && (
-                        <tr><td colSpan={5} className="p-4 text-center text-muted-foreground">No staff members</td></tr>
+                        <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No staff members</td></tr>
                       )}
                     </tbody>
                   </table>
