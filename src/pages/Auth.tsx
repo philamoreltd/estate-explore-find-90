@@ -34,12 +34,13 @@ const Auth = () => {
   
   const returnUrl = searchParams.get('returnUrl') || '/';
 
-  // Redirect to return URL if user is already logged in
+  // Redirect to home page if user is already logged in (including after email confirmation)
   useEffect(() => {
     if (!authLoading && user) {
-      navigate(returnUrl);
+      // Always redirect to home page after successful authentication
+      navigate('/', { replace: true });
     }
-  }, [user, authLoading, navigate, returnUrl]);
+  }, [user, authLoading, navigate]);
 
   const validateSignUp = () => {
     const newErrors: { [key: string]: string } = {};
