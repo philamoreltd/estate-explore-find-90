@@ -57,6 +57,25 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   const [showStatusConfirmDialog, setShowStatusConfirmDialog] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<PropertyFormData | null>(null);
   const originalStatusRef = useRef<string>("available");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (!user) return;
+      
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .single();
+      
+      setIsAdmin(!!roleData);
+    };
+    
+    checkAdminRole();
+  }, [user]);
 
   const form = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
@@ -404,6 +423,12 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                       <SelectContent>
                         <SelectItem value="available">Available</SelectItem>
                         <SelectItem value="occupied">Occupied</SelectItem>
+                        {isAdmin && (
+                          <>
+                            <SelectItem value="rented">Rented</SelectItem>
+                            <SelectItem value="maintenance">Under Maintenance</SelectItem>
+                          </>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
