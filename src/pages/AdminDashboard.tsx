@@ -7,6 +7,7 @@ import {
   Users, 
   Home, 
   Eye, 
+  Edit,
   Trash2, 
   MapPin, 
   Calendar,
@@ -642,9 +643,23 @@ const AdminDashboard = () => {
                         </div>
                         
                         <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="flex-1">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="flex-1"
+                            onClick={() => navigate(`/property/${property.id}`)}
+                          >
                             <Eye className="h-4 w-4 mr-1" />
                             View
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="flex-1"
+                            onClick={() => navigate(`/edit-property/${property.id}`)}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
                           </Button>
                           <Button 
                             size="sm" 
