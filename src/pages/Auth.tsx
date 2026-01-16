@@ -159,7 +159,7 @@ const Auth = () => {
     setErrors({});
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
         email: signInData.email,
         password: signInData.password,
       });
@@ -171,6 +171,22 @@ const Auth = () => {
           setErrors({ general: error.message });
         }
         return;
+      }
+
+      // Check if user account is active
+      if (authData.user) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('is_active')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        if (profileData && !profileData.is_active) {
+          // Sign out the user since their account is not active
+          await supabase.auth.signOut();
+          setErrors({ general: "Your account is pending activation. Please contact an administrator." });
+          return;
+        }
       }
 
       toast({
