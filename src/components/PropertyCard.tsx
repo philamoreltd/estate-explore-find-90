@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 import { Heart, Bed, Bath, Square, MapPin, MessageCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ScheduleViewingModal from "./ScheduleViewingModal";
@@ -56,7 +57,17 @@ const PropertyCard = ({
         {/* Image Carousel */}
         <div className="relative overflow-hidden">
           {imageUrls && imageUrls.length > 1 ? (
-            <Carousel className="w-full">
+            <Carousel 
+              className="w-full"
+              opts={{ loop: true }}
+              plugins={[
+                Autoplay({
+                  delay: 3000,
+                  stopOnInteraction: true,
+                  stopOnMouseEnter: true,
+                }),
+              ]}
+            >
               <CarouselContent>
                 {imageUrls.map((imageUrl, index) => (
                   <CarouselItem key={index}>
