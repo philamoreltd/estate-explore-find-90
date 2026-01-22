@@ -1,4 +1,4 @@
-import { Home, Search, PlusCircle, Building2, User, LogIn } from "lucide-react";
+import { Home, Search, PlusCircle, Building2, User, LogIn, ArrowLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -8,11 +8,15 @@ const BottomNavigation = () => {
   const location = useLocation();
   const { user } = useAuth();
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   const navItems = [
+    { label: "Back", icon: ArrowLeft, path: "back", onClick: handleBack },
     { label: "Home", icon: Home, path: "/" },
     { label: "Browse", icon: Search, path: "/browse" },
     { label: "Add", icon: PlusCircle, path: "/add-property" },
-    { label: "Landlords", icon: Building2, path: "/landlords" },
     { 
       label: user ? "Account" : "Sign In", 
       icon: user ? User : LogIn, 
@@ -30,7 +34,7 @@ const BottomNavigation = () => {
           return (
             <button
               key={item.path}
-              onClick={() => navigate(item.path)}
+              onClick={() => item.onClick ? item.onClick() : navigate(item.path)}
               className={cn(
                 "flex flex-col items-center justify-center flex-1 h-full px-2 transition-colors",
                 isActive 
