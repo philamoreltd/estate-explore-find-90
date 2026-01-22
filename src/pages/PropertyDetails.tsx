@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Navigation from "@/components/Navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import ContactModal from "@/components/ContactModal";
 import ScheduleViewingModal from "@/components/ScheduleViewingModal";
 import PaymentModal from "@/components/PaymentModal";
@@ -210,7 +211,7 @@ const PropertyDetails = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         <Navigation />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="animate-pulse">
@@ -225,13 +226,14 @@ const PropertyDetails = () => {
             </div>
           </div>
         </div>
+        <BottomNavigation />
       </div>
     );
   }
 
   if (!property) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         <Navigation />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
@@ -240,12 +242,13 @@ const PropertyDetails = () => {
             <Button onClick={() => navigate('/browse')}>Back to Browse</Button>
           </div>
         </div>
+        <BottomNavigation />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Navigation />
       
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -578,6 +581,7 @@ const PropertyDetails = () => {
           setShowPaymentModal(false);
         }}
       />
+      <BottomNavigation />
     </div>
   );
 };

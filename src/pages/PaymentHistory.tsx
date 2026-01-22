@@ -14,6 +14,7 @@ import {
   DollarSign
 } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -206,7 +207,7 @@ const PaymentHistory = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Navigation />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -389,6 +390,7 @@ const PaymentHistory = () => {
           </CardContent>
         </Card>
       </div>
+      <BottomNavigation />
     </div>
   );
 };
