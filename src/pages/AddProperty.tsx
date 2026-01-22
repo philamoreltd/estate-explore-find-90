@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import Navigation from "@/components/Navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import PropertyForm from "@/components/PropertyForm";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
@@ -16,11 +17,12 @@ const AddProperty = () => {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
         <Navigation />
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <PropertyForm onSuccess={handleSuccess} onCancel={handleCancel} />
         </div>
+        <BottomNavigation />
       </div>
     </ProtectedRoute>
   );
