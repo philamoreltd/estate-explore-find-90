@@ -1,10 +1,11 @@
 import Navigation from "@/components/Navigation";
+import BottomNavigation from "@/components/BottomNavigation";
 import FeaturedPropertiesCarousel from "@/components/FeaturedPropertiesCarousel";
 import StatsSection from "@/components/StatsSection";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-16 md:pb-0">
       <Navigation />
       <FeaturedPropertiesCarousel />
       <StatsSection />
@@ -57,6 +58,7 @@ const Index = () => {
           </div>
         </div>
       </footer>
+      <BottomNavigation />
     </div>
   );
 };
