@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Home, Mail, Lock, User, AlertCircle, Phone, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import BottomNavigation from "@/components/BottomNavigation";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -205,7 +206,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
@@ -436,6 +437,7 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      <BottomNavigation />
     </div>
   );
 };
