@@ -15,6 +15,8 @@ import { useAuth } from "@/contexts/AuthContext";
 const Auth = () => {
   const { user, isLoading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState("");
   const [signUpData, setSignUpData] = useState({
     email: "",
     password: "",
@@ -205,6 +207,48 @@ const Auth = () => {
     }
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!forgotPasswordEmail.trim()) {
+      setErrors({ forgotEmail: "Email is required" });
+      return;
+    }
+    
+    if (!/\S+@\S+\.\S+/.test(forgotPasswordEmail)) {
+      setErrors({ forgotEmail: "Please enter a valid email address" });
+      return;
+    }
+    
+    setIsLoading(true);
+    setErrors({});
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotPasswordEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        setErrors({ forgotEmail: error.message });
+        return;
+      }
+
+      toast({
+        title: "Check your email",
+        description: "We've sent you a password reset link.",
+      });
+      
+      setShowForgotPassword(false);
+      setForgotPasswordEmail("");
+      
+    } catch (error: any) {
+      console.error("Forgot password error:", error);
+      setErrors({ forgotEmail: "An unexpected error occurred. Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
       <Card className="w-full max-w-md">
@@ -272,6 +316,16 @@ const Auth = () => {
                   )}
                 </div>
                 
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setShowForgotPassword(true)}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                
                 <Button 
                   type="submit" 
                   className="w-full" 
@@ -279,6 +333,52 @@ const Auth = () => {
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
                 </Button>
+                
+                {showForgotPassword && (
+                  <div className="mt-4 p-4 border rounded-lg bg-muted/50 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Reset Password</h4>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowForgotPassword(false);
+                          setForgotPasswordEmail("");
+                          setErrors({});
+                        }}
+                        className="text-muted-foreground hover:text-foreground"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Enter your email and we'll send you a reset link.
+                    </p>
+                    <div className="space-y-2">
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          type="email"
+                          placeholder="Enter your email"
+                          value={forgotPasswordEmail}
+                          onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                          className="pl-10"
+                          disabled={isLoading}
+                        />
+                      </div>
+                      {errors.forgotEmail && (
+                        <p className="text-sm text-destructive">{errors.forgotEmail}</p>
+                      )}
+                    </div>
+                    <Button 
+                      type="button"
+                      onClick={handleForgotPassword}
+                      className="w-full" 
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Sending..." : "Send Reset Link"}
+                    </Button>
+                  </div>
+                )}
               </form>
             </TabsContent>
             

@@ -15,6 +15,7 @@ import EditProperty from "./pages/EditProperty";
 import AdminDashboard from "./pages/AdminDashboard";
 import PaymentHistory from "./pages/PaymentHistory";
 import Auth from "./pages/Auth";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -61,6 +62,7 @@ const App = () => (
               </ProtectedRoute>
             } />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
