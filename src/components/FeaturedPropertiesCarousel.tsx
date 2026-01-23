@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentLocation, calculateDistance, type LocationData } from "@/utils/location";
 import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 
 interface Property {
   id: string;
@@ -43,11 +44,20 @@ const FeaturedPropertiesCarousel = () => {
   const [locationLoading, setLocationLoading] = useState(false);
   const { toast } = useToast();
   
-  const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
-    align: "start",
-    slidesToScroll: 1,
-  });
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+      align: "start",
+      slidesToScroll: 1,
+    },
+    [
+      Autoplay({
+        delay: 4000,
+        stopOnInteraction: true,
+        stopOnMouseEnter: true,
+      }),
+    ]
+  );
   
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
@@ -283,7 +293,7 @@ const FeaturedPropertiesCarousel = () => {
 
   return (
     <>
-      {/* Hero Filter Section with House Background */}
+      {/* Hero Section */}
       <section 
         className="relative py-20 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url('/hero-house.jpg')` }}
@@ -293,115 +303,13 @@ const FeaturedPropertiesCarousel = () => {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Hero Text */}
-          <div className="text-center mb-10">
+          <div className="text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 drop-shadow-lg">
               Find Your Dream Home
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
               Discover exceptional rental properties in Kenya
             </p>
-          </div>
-
-          {/* Filters */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-6">
-              <Filter className="h-5 w-5 text-real-estate-blue" />
-              <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
-              {/* Search */}
-              <div className="relative lg:col-span-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
-                <Input
-                  placeholder="Search location or title..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 bg-white border-gray-200"
-                />
-              </div>
-
-              {/* Property Type */}
-              <Select value={propertyType} onValueChange={setPropertyType}>
-                <SelectTrigger className="bg-white border-gray-200">
-                  <SelectValue placeholder="Property Type" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="bnb">BnB</SelectItem>
-                  <SelectItem value="bedsitter">Bedsitter</SelectItem>
-                  <SelectItem value="single-room">Single Room</SelectItem>
-                  <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
-                  <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
-                  <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
-                  <SelectItem value="maisonette">Maisonette</SelectItem>
-                  <SelectItem value="bungalow">Bungalow</SelectItem>
-                  <SelectItem value="compound-house">Compound House</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Monthly Rent */}
-              <Select value={maxRent} onValueChange={setMaxRent}>
-                <SelectTrigger className="bg-white border-gray-200">
-                  <SelectValue placeholder="Max Rent" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">Any Price</SelectItem>
-                  <SelectItem value="25000">Up to Ksh 25K</SelectItem>
-                  <SelectItem value="50000">Up to Ksh 50K</SelectItem>
-                  <SelectItem value="75000">Up to Ksh 75K</SelectItem>
-                  <SelectItem value="100000">Up to Ksh 100K</SelectItem>
-                  <SelectItem value="150000">Up to Ksh 150K</SelectItem>
-                  <SelectItem value="200000">Up to Ksh 200K</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Furnished Status */}
-              <Select value={furnishedStatus} onValueChange={setFurnishedStatus}>
-                <SelectTrigger className="bg-white border-gray-200">
-                  <SelectValue placeholder="Furnished" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">Any</SelectItem>
-                  <SelectItem value="furnished">Furnished</SelectItem>
-                  <SelectItem value="unfurnished">Unfurnished</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Rental Term */}
-              <Select value={rentalTerm} onValueChange={setRentalTerm}>
-                <SelectTrigger className="bg-white border-gray-200">
-                  <SelectValue placeholder="Rental Term" />
-                </SelectTrigger>
-                <SelectContent className="bg-popover z-50">
-                  <SelectItem value="all">Any Term</SelectItem>
-                  <SelectItem value="short-term">Short Term</SelectItem>
-                  <SelectItem value="long-term">Long Term</SelectItem>
-                </SelectContent>
-              </Select>
-
-              {/* Clear Filters */}
-              <Button 
-                variant="outline" 
-                onClick={clearFilters}
-                className="w-full bg-white hover:bg-gray-50"
-              >
-                Clear Filters
-              </Button>
-            </div>
-
-            {/* Location Button */}
-            <div className="flex justify-center pt-2">
-              <Button 
-                variant="default" 
-                className="flex items-center gap-2 bg-real-estate-blue hover:bg-real-estate-blue/90"
-                onClick={getUserLocation}
-                disabled={locationLoading}
-              >
-                <Target className="h-4 w-4" />
-                {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
-              </Button>
-            </div>
           </div>
         </div>
       </section>
@@ -488,6 +396,112 @@ const FeaturedPropertiesCarousel = () => {
               View All Rentals
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Filter Section - Below Featured Rentals */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-muted/30 rounded-2xl shadow-lg p-6 md:p-8 border border-border/50">
+            <div className="flex items-center gap-2 mb-6">
+              <Filter className="h-5 w-5 text-real-estate-blue" />
+              <h3 className="text-lg font-semibold text-real-estate-navy">Filter Properties</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 mb-4">
+              {/* Search */}
+              <div className="relative lg:col-span-1">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-real-estate-gray" />
+                <Input
+                  placeholder="Search location or title..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 bg-background border-input"
+                />
+              </div>
+
+              {/* Property Type */}
+              <Select value={propertyType} onValueChange={setPropertyType}>
+                <SelectTrigger className="bg-background border-input">
+                  <SelectValue placeholder="Property Type" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="bnb">BnB</SelectItem>
+                  <SelectItem value="bedsitter">Bedsitter</SelectItem>
+                  <SelectItem value="single-room">Single Room</SelectItem>
+                  <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
+                  <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
+                  <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
+                  <SelectItem value="maisonette">Maisonette</SelectItem>
+                  <SelectItem value="bungalow">Bungalow</SelectItem>
+                  <SelectItem value="compound-house">Compound House</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Monthly Rent */}
+              <Select value={maxRent} onValueChange={setMaxRent}>
+                <SelectTrigger className="bg-background border-input">
+                  <SelectValue placeholder="Max Rent" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">Any Price</SelectItem>
+                  <SelectItem value="25000">Up to Ksh 25K</SelectItem>
+                  <SelectItem value="50000">Up to Ksh 50K</SelectItem>
+                  <SelectItem value="75000">Up to Ksh 75K</SelectItem>
+                  <SelectItem value="100000">Up to Ksh 100K</SelectItem>
+                  <SelectItem value="150000">Up to Ksh 150K</SelectItem>
+                  <SelectItem value="200000">Up to Ksh 200K</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Furnished Status */}
+              <Select value={furnishedStatus} onValueChange={setFurnishedStatus}>
+                <SelectTrigger className="bg-background border-input">
+                  <SelectValue placeholder="Furnished" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="furnished">Furnished</SelectItem>
+                  <SelectItem value="unfurnished">Unfurnished</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Rental Term */}
+              <Select value={rentalTerm} onValueChange={setRentalTerm}>
+                <SelectTrigger className="bg-background border-input">
+                  <SelectValue placeholder="Rental Term" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover z-50">
+                  <SelectItem value="all">Any Term</SelectItem>
+                  <SelectItem value="short-term">Short Term</SelectItem>
+                  <SelectItem value="long-term">Long Term</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Clear Filters */}
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="w-full"
+              >
+                Clear Filters
+              </Button>
+            </div>
+
+            {/* Location Button */}
+            <div className="flex justify-center pt-2">
+              <Button 
+                variant="default" 
+                className="flex items-center gap-2 bg-real-estate-blue hover:bg-real-estate-blue/90"
+                onClick={getUserLocation}
+                disabled={locationLoading}
+              >
+                <Target className="h-4 w-4" />
+                {locationLoading ? "Getting Location..." : userLocation ? "Location Found" : "Use My Location"}
+              </Button>
+            </div>
           </div>
         </div>
       </section>
