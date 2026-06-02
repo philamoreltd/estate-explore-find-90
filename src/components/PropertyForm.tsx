@@ -196,6 +196,16 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   };
 
   const handleFormSubmit = (data: PropertyFormData) => {
+    // Require listing fee clearance when creating a new property as a non-admin
+    if (!propertyId && !isAdmin && !listingFeeCleared) {
+      toast({
+        title: "Listing fee required",
+        description: "Pay the 2% listing fee or enter an admin code to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Check if status is changing from available to occupied (when editing)
     if (propertyId && originalStatusRef.current === 'available' && data.status === 'occupied') {
       setPendingFormData(data);
@@ -268,6 +278,14 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
           variant: "destructive",
         });
         return;
+      }
+
+      // Consume the listing fee payment (if used) so it can't be reused
+      if (!propertyId && !isAdmin && listingFeeCleared?.method === "payment") {
+        await supabase
+          .from("listing_payments")
+          .update({ consumed: true })
+          .eq("id", listingFeeCleared.reference);
       }
 
       toast({
