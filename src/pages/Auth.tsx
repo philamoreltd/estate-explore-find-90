@@ -629,7 +629,7 @@ const Auth = () => {
                   {errors.confirmPassword && (
                     <p className="text-sm text-destructive">{errors.confirmPassword}</p>
                   )}
-                </div>
+    </main>
                 
                 <Button 
                   type="submit" 
