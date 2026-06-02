@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Upload, X, Phone, MapPin } from "lucide-react";
 import { getCurrentLocation } from "@/utils/location";
+import ListingFeeGate from "@/components/ListingFeeGate";
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -58,6 +59,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   const [pendingFormData, setPendingFormData] = useState<PropertyFormData | null>(null);
   const originalStatusRef = useRef<string>("available");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [listingFeeCleared, setListingFeeCleared] = useState<{ method: "code" | "payment"; reference: string } | null>(null);
 
   // Check if user is admin
   useEffect(() => {
