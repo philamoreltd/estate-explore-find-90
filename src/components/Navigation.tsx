@@ -101,6 +101,8 @@ const Navigation = () => {
             <Button 
               variant="ghost" 
               size="icon"
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (

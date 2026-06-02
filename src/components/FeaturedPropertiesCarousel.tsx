@@ -333,6 +333,7 @@ const FeaturedPropertiesCarousel = () => {
               <Button
                 variant="outline"
                 size="icon"
+                aria-label="Previous featured rentals"
                 onClick={scrollPrev}
                 disabled={!canScrollPrev}
                 className="rounded-full border-real-estate-blue text-real-estate-blue hover:bg-real-estate-blue hover:text-white disabled:opacity-50"
@@ -342,6 +343,7 @@ const FeaturedPropertiesCarousel = () => {
               <Button
                 variant="outline"
                 size="icon"
+                aria-label="Next featured rentals"
                 onClick={scrollNext}
                 disabled={!canScrollNext}
                 className="rounded-full border-real-estate-blue text-real-estate-blue hover:bg-real-estate-blue hover:text-white disabled:opacity-50"
