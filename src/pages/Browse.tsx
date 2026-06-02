@@ -14,6 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { getCurrentLocation, calculateDistance, formatDistance, type LocationData } from "@/utils/location";
 import PropertyCard from "@/components/PropertyCard";
+import SEO from "@/components/SEO";
 
 interface Property {
   id: string;
@@ -181,9 +182,14 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <SEO
+        title="Browse rentals in Kenya | Housevilla"
+        description="Search and filter rental properties across Kenya by price, bedrooms, property type and distance from your location."
+        path="/browse"
+      />
       <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-real-estate-navy mb-2">
             Browse Properties
@@ -233,7 +239,7 @@ const Browse = () => {
           {showFilters && (
             <Card className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-real-estate-navy">Filters</h3>
+                <h2 className="text-lg font-semibold text-real-estate-navy">Filters</h2>
                 <div className="flex gap-2">
                   {hasActiveFilters && (
                     <Button variant="ghost" size="sm" onClick={clearFilters}>
@@ -241,7 +247,7 @@ const Browse = () => {
                       Clear all
                     </Button>
                   )}
-                  <Button variant="ghost" size="sm" onClick={() => setShowFilters(false)}>
+                  <Button variant="ghost" size="sm" aria-label="Close filters" onClick={() => setShowFilters(false)}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
@@ -409,7 +415,7 @@ const Browse = () => {
             <p className="text-real-estate-gray">No properties found matching your search.</p>
           </div>
         )}
-      </div>
+      </main>
       <BottomNavigation />
     </div>
   );
