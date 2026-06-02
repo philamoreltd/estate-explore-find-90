@@ -23,6 +23,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Upload, X, Phone, MapPin } from "lucide-react";
 import { getCurrentLocation } from "@/utils/location";
+import ListingFeeGate from "@/components/ListingFeeGate";
 
 const propertySchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -58,6 +59,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   const [pendingFormData, setPendingFormData] = useState<PropertyFormData | null>(null);
   const originalStatusRef = useRef<string>("available");
   const [isAdmin, setIsAdmin] = useState(false);
+  const [listingFeeCleared, setListingFeeCleared] = useState<{ method: "code" | "payment"; reference: string } | null>(null);
 
   // Check if user is admin
   useEffect(() => {
@@ -194,6 +196,16 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
   };
 
   const handleFormSubmit = (data: PropertyFormData) => {
+    // Require listing fee clearance when creating a new property as a non-admin
+    if (!propertyId && !isAdmin && !listingFeeCleared) {
+      toast({
+        title: "Listing fee required",
+        description: "Pay the 2% listing fee or enter an admin code to continue.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Check if status is changing from available to occupied (when editing)
     if (propertyId && originalStatusRef.current === 'available' && data.status === 'occupied') {
       setPendingFormData(data);
@@ -266,6 +278,14 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
           variant: "destructive",
         });
         return;
+      }
+
+      // Consume the listing fee payment (if used) so it can't be reused
+      if (!propertyId && !isAdmin && listingFeeCleared?.method === "payment") {
+        await supabase
+          .from("listing_payments")
+          .update({ consumed: true })
+          .eq("id", listingFeeCleared.reference);
       }
 
       toast({
@@ -653,6 +673,15 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                 </FormItem>
               )}
             />
+
+            {!propertyId && !isAdmin && (
+              <ListingFeeGate
+                rentAmount={form.watch("rent_amount") || 0}
+                phoneNumber={form.watch("phone") || ""}
+                cleared={listingFeeCleared}
+                onCleared={setListingFeeCleared}
+              />
+            )}
 
             <div className="flex gap-3 justify-end">
               <Button type="button" variant="outline" onClick={onCancel}>

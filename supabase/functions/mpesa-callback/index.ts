@@ -33,46 +33,51 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Find the payment record
-    const { data: payment, error: findError } = await supabaseService
+    // Find the payment record in either contact_payments or listing_payments
+    let table: "contact_payments" | "listing_payments" = "contact_payments";
+    let { data: payment, error: findError } = await supabaseService
       .from("contact_payments")
       .select("*")
       .eq("checkout_request_id", CheckoutRequestID)
-      .single();
+      .maybeSingle();
 
-    if (findError || !payment) {
+    if (!payment) {
+      const { data: listingPayment, error: listingErr } = await supabaseService
+        .from("listing_payments")
+        .select("*")
+        .eq("checkout_request_id", CheckoutRequestID)
+        .maybeSingle();
+      payment = listingPayment;
+      findError = listingErr;
+      table = "listing_payments";
+    }
+
+    if (!payment) {
       console.error("Payment record not found:", findError);
       return new Response("Payment record not found", { status: 404 });
     }
 
-    let updateData: any = {
+    const updateData: Record<string, unknown> = {
       updated_at: new Date().toISOString(),
     };
 
     if (ResultCode === 0) {
-      // Payment successful
       updateData.payment_status = "completed";
-      
-      // Extract transaction details from callback metadata
       if (stkCallback.CallbackMetadata?.Item) {
         const metadata = stkCallback.CallbackMetadata.Item;
-        const transactionId = metadata.find(item => item.Name === "MpesaReceiptNumber")?.Value;
-        
-        if (transactionId) {
-          updateData.transaction_id = transactionId;
-        }
+        const transactionId = metadata.find(
+          (item) => item.Name === "MpesaReceiptNumber"
+        )?.Value;
+        if (transactionId) updateData.transaction_id = transactionId;
       }
-      
-      console.log("Payment completed successfully for checkout:", CheckoutRequestID);
+      console.log(`Payment completed (${table}) for:`, CheckoutRequestID);
     } else {
-      // Payment failed or cancelled
       updateData.payment_status = "failed";
-      console.log("Payment failed for checkout:", CheckoutRequestID, "Reason:", ResultDesc);
+      console.log(`Payment failed (${table}) for:`, CheckoutRequestID, ResultDesc);
     }
 
-    // Update payment record
     const { error: updateError } = await supabaseService
-      .from("contact_payments")
+      .from(table)
       .update(updateData)
       .eq("id", payment.id);
 

@@ -94,6 +94,78 @@ export type Database = {
           },
         ]
       }
+      listing_fee_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      listing_payments: {
+        Row: {
+          amount: number
+          checkout_request_id: string | null
+          code_used: string | null
+          consumed: boolean
+          created_at: string
+          id: string
+          payment_status: string
+          phone_number: string
+          transaction_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          checkout_request_id?: string | null
+          code_used?: string | null
+          consumed?: boolean
+          created_at?: string
+          id?: string
+          payment_status?: string
+          phone_number: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          checkout_request_id?: string | null
+          code_used?: string | null
+          consumed?: boolean
+          created_at?: string
+          id?: string
+          payment_status?: string
+          phone_number?: string
+          transaction_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -297,6 +369,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      has_available_listing_payment: {
+        Args: { p_user_id: string }
+        Returns: boolean
+      }
       has_paid_for_contact_access: {
         Args: { p_property_id: string; p_user_id: string }
         Returns: boolean
@@ -309,6 +385,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      validate_listing_code: { Args: { p_code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "landlord" | "tenant" | "user"

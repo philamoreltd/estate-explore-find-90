@@ -28,6 +28,7 @@ import { useNavigate } from "react-router-dom";
 import { AddUserDialog } from "@/components/admin/AddUserDialog";
 import { AddPropertyDialog } from "@/components/admin/AddPropertyDialog";
 import { ActivityLogs } from "@/components/admin/ActivityLogs";
+import { ListingCodesManager } from "@/components/admin/ListingCodesManager";
 
 interface UserData {
   id: string;
@@ -441,12 +442,13 @@ const AdminDashboard = () => {
 
         {/* Tabs for different views */}
         <Tabs defaultValue="landlords" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="landlords">Landlords</TabsTrigger>
             <TabsTrigger value="tenants">Tenants</TabsTrigger>
             <TabsTrigger value="staff">Staff</TabsTrigger>
             <TabsTrigger value="properties">Properties</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
+            <TabsTrigger value="codes">Codes</TabsTrigger>
             <TabsTrigger value="payments" onClick={() => navigate('/admin/payments')}>Payments</TabsTrigger>
           </TabsList>
 
@@ -773,6 +775,10 @@ const AdminDashboard = () => {
 
           <TabsContent value="activity" className="space-y-6">
             <ActivityLogs />
+          </TabsContent>
+
+          <TabsContent value="codes" className="space-y-6">
+            <ListingCodesManager />
           </TabsContent>
         </Tabs>
       </div>
