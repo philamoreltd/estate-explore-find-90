@@ -674,6 +674,15 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
               )}
             />
 
+            {!propertyId && !isAdmin && (
+              <ListingFeeGate
+                rentAmount={form.watch("rent_amount") || 0}
+                phoneNumber={form.watch("phone") || ""}
+                cleared={listingFeeCleared}
+                onCleared={setListingFeeCleared}
+              />
+            )}
+
             <div className="flex gap-3 justify-end">
               <Button type="button" variant="outline" onClick={onCancel}>
                 Cancel
