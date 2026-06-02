@@ -12,3 +12,11 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /add-property
+Disallow: /edit-property
+Disallow: /landlords
+Disallow: /tenants
+Disallow: /reset-password
+
+Sitemap: https://housevilla.co.ke/sitemap.xml
