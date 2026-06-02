@@ -573,7 +573,7 @@ const PropertyDetails = () => {
             </Card>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Contact Modal */}
       <ContactModal
