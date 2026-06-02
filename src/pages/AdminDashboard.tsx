@@ -776,6 +776,10 @@ const AdminDashboard = () => {
           <TabsContent value="activity" className="space-y-6">
             <ActivityLogs />
           </TabsContent>
+
+          <TabsContent value="codes" className="space-y-6">
+            <ListingCodesManager />
+          </TabsContent>
         </Tabs>
       </div>
       <BottomNavigation />
