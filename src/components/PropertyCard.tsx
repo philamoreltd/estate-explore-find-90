@@ -105,7 +105,7 @@ const PropertyCard = ({
                 </Badge>
               )}
             </div>
-            <Button variant="ghost" size="icon" className="bg-white/80 hover:bg-white">
+            <Button variant="ghost" size="icon" aria-label="Save to favorites" className="bg-white/80 hover:bg-white">
               <Heart className="h-4 w-4 text-real-estate-gray hover:text-red-500 transition-colors" />
             </Button>
           </div>

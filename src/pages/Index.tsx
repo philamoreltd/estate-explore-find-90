@@ -2,13 +2,41 @@ import Navigation from "@/components/Navigation";
 import BottomNavigation from "@/components/BottomNavigation";
 import FeaturedPropertiesCarousel from "@/components/FeaturedPropertiesCarousel";
 import StatsSection from "@/components/StatsSection";
+import SEO from "@/components/SEO";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <SEO
+        title="Housevilla — Rentals in Kenya: apartments, bedsitters & more"
+        description="Find rental homes across Kenya on Housevilla. Browse apartments, bedsitters, BnBs, maisonettes and bungalows with verified landlord contacts."
+        path="/"
+        jsonLd={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: "Housevilla",
+            url: "https://housevilla.co.ke/",
+            potentialAction: {
+              "@type": "SearchAction",
+              target: "https://housevilla.co.ke/browse?q={search_term_string}",
+              "query-input": "required name=search_term_string",
+            },
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Housevilla",
+            url: "https://housevilla.co.ke/",
+            areaServed: "KE",
+          },
+        ]}
+      />
       <Navigation />
-      <FeaturedPropertiesCarousel />
-      <StatsSection />
+      <main>
+        <FeaturedPropertiesCarousel />
+        <StatsSection />
+      </main>
       
       {/* Footer */}
       <footer className="bg-real-estate-navy text-white py-12">

@@ -12,6 +12,7 @@ import { supabase } from "@/integrations/supabase/client";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import SEO from "@/components/SEO";
 
 const Auth = () => {
   const { user, isLoading: authLoading } = useAuth();
@@ -274,7 +275,14 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
+    <main className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
+      <SEO
+        title="Sign in to Housevilla | Rentals in Kenya"
+        description="Sign in or create an account on Housevilla to contact landlords and list your rental properties."
+        path="/auth"
+        noindex
+      />
+      <h1 className="sr-only">Sign in to Housevilla</h1>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
@@ -622,6 +630,8 @@ const Auth = () => {
                     <p className="text-sm text-destructive">{errors.confirmPassword}</p>
                   )}
                 </div>
+
+
                 
                 <Button 
                   type="submit" 
@@ -636,7 +646,7 @@ const Auth = () => {
         </CardContent>
       </Card>
       <BottomNavigation />
-    </div>
+    </main>
   );
 };
 

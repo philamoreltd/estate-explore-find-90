@@ -1,0 +1,11 @@
+# Housevilla
+
+> Housevilla is a Kenyan rental property marketplace where tenants discover apartments, bedsitters, BnBs, maisonettes and bungalows, and landlords list and manage their properties.
+
+Housevilla helps renters in Kenya find their next home with location-based search, verified listings, and a pay-to-unlock contact model that protects landlord privacy.
+
+## Pages
+
+- [Home](/): Overview of Housevilla and featured rental listings across Kenya.
+- [Browse rentals](/browse): Search and filter all available properties by type, price, bedrooms, and distance.
+- [Sign in or sign up](/auth): Create an account or sign in to contact landlords and list properties.

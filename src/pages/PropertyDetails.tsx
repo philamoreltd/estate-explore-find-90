@@ -13,6 +13,7 @@ import PaymentModal from "@/components/PaymentModal";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import SEO from "@/components/SEO";
 
 interface Property {
   id: string;
@@ -249,9 +250,35 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <SEO
+        title={`${property.title} — ${property.location} | Housevilla`}
+        description={(property.description || `${property.bedrooms} bedroom ${property.property_type} in ${property.location} on Housevilla.`).slice(0, 158)}
+        path={`/property/${property.id}`}
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "RealEstateListing",
+          name: property.title,
+          description: property.description || undefined,
+          image: property.image_urls?.length ? property.image_urls : (property.image_url ? [property.image_url] : undefined),
+          datePosted: property.created_at,
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: property.location,
+            addressCountry: "KE",
+          },
+          numberOfBedrooms: property.bedrooms,
+          numberOfBathroomsTotal: property.bathrooms,
+          offers: {
+            "@type": "Offer",
+            price: property.rent_amount,
+            priceCurrency: "KES",
+            availability: property.status === "available" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+          },
+        }}
+      />
       <Navigation />
-      
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back Button */}
         <Button
           variant="ghost"
@@ -301,6 +328,7 @@ const PropertyDetails = () => {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Previous image"
                       className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       onClick={prevImage}
                     >
@@ -311,6 +339,7 @@ const PropertyDetails = () => {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Next image"
                       className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       onClick={nextImage}
                     >
@@ -544,7 +573,7 @@ const PropertyDetails = () => {
             </Card>
           </div>
         </div>
-      </div>
+      </main>
 
       {/* Contact Modal */}
       <ContactModal

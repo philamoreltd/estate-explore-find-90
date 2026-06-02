@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import StatusReminderDialog from "@/components/StatusReminderDialog";
+import SEO from "@/components/SEO";
 
 interface Property {
   id: string;
@@ -86,9 +87,15 @@ const Landlords = () => {
 
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <SEO
+        title="My properties | Housevilla landlord dashboard"
+        description="Manage your Housevilla rental property listings, update availability, and track performance."
+        path="/landlords"
+        noindex
+      />
       <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-real-estate-navy mb-2">
@@ -185,9 +192,9 @@ const Landlords = () => {
           <Card>
             <CardContent className="p-12 text-center">
               <Home className="h-12 w-12 text-real-estate-gray mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-real-estate-navy mb-2">
+              <h2 className="text-lg font-semibold text-real-estate-navy mb-2">
                 No Properties Listed Yet
-              </h3>
+              </h2>
               <p className="text-real-estate-gray mb-6">
                 Start by adding your first rental property to attract potential tenants.
               </p>
@@ -219,9 +226,9 @@ const Landlords = () => {
                 </div>
                 
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-real-estate-navy mb-2 line-clamp-2">
+                  <h2 className="font-semibold text-real-estate-navy mb-2 line-clamp-2">
                     {property.title}
-                  </h3>
+                  </h2>
                   
                   <div className="flex items-center gap-1 text-real-estate-gray mb-3">
                     <MapPin className="h-4 w-4" />
@@ -270,7 +277,7 @@ const Landlords = () => {
             ))}
           </div>
         )}
-      </div>
+      </main>
       {user && (
         <StatusReminderDialog
           userId={user.id}
