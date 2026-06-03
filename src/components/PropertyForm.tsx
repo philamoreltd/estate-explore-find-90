@@ -86,9 +86,9 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
       property_type: "",
       location: "",
       phone: "",
-      rent_amount: 0,
-      bedrooms: 0,
-      bathrooms: 0,
+      rent_amount: undefined as unknown as number,
+      bedrooms: undefined as unknown as number,
+      bathrooms: undefined as unknown as number,
       size_sqft: undefined,
       description: "",
       status: "available",
@@ -467,7 +467,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                         type="number"
                         placeholder="50000"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
                       />
                     </FormControl>
                     <FormMessage />
@@ -628,7 +629,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                         type="number"
                         placeholder="2"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
                       />
                     </FormControl>
                     <FormMessage />
@@ -647,7 +649,8 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                         type="number"
                         placeholder="2"
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? ''}
+                        onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
                       />
                     </FormControl>
                     <FormMessage />
