@@ -35,8 +35,8 @@ serve(async (req) => {
       throw new Error("Missing required fields: rentAmount, phoneNumber");
     }
 
-    // 2% of monthly rent, minimum KES 10, rounded up to whole shilling
-    const amount = Math.max(10, Math.ceil(rentAmount * 0.02));
+    // 4% of monthly rent, minimum KES 10, rounded up to whole shilling
+    const amount = Math.max(10, Math.ceil(rentAmount * 0.04));
 
     const cleanPhone = phoneNumber.replace(/\D/g, "");
     if (!cleanPhone.match(/^(254|0)?[7][0-9]{8}$/)) {
