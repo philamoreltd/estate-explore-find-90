@@ -15,7 +15,7 @@ interface ListingFeeGateProps {
   onCleared: (info: { method: "code" | "payment"; reference: string }) => void;
 }
 
-const calcFee = (rent: number) => Math.max(10, Math.ceil((rent || 0) * 0.02));
+const calcFee = (rent: number) => Math.max(10, Math.ceil((rent || 0) * 0.04));
 
 const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: ListingFeeGateProps) => {
   const { user } = useAuth();
@@ -176,7 +176,7 @@ const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: Listing
           <span className="text-primary">KES {fee.toLocaleString()}</span>
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          2% of monthly rent (min KES 10). Pay via M-Pesa or enter an admin code.
+          4% of monthly rent (min KES 10). Pay via M-Pesa or enter an admin code.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
