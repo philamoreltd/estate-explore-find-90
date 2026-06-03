@@ -176,7 +176,7 @@ const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: Listing
           <span className="text-primary">KES {fee.toLocaleString()}</span>
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          4% of monthly rent (min KES 10). Pay via M-Pesa or enter an admin code.
+          Pay via M-Pesa or enter an admin code.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
