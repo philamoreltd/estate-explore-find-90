@@ -272,7 +272,7 @@ const Tenants = () => {
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    placeholder="e.g., Modern 2BR Apartment in Kilimani"
+                    placeholder="e.g., Modern 2BR Apartment in Brooklyn"
                     className="mt-1"
                     disabled={isLoading}
                   />
