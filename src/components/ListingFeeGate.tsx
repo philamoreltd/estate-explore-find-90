@@ -10,21 +10,20 @@ import { Loader2, CheckCircle2, KeyRound } from "lucide-react";
 
 interface ListingFeeGateProps {
   rentAmount: number;
-  phoneNumber: string;
+  phoneNumber?: string;
   cleared: { method: "code" | "payment"; reference: string } | null;
   onCleared: (info: { method: "code" | "payment"; reference: string }) => void;
 }
 
 const calcFee = (rent: number) => Math.max(10, Math.ceil((rent || 0) * 0.04));
 
-const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: ListingFeeGateProps) => {
+const ListingFeeGate = ({ rentAmount, cleared, onCleared }: ListingFeeGateProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [code, setCode] = useState("");
   const [isValidating, setIsValidating] = useState(false);
-  const [isPaying, setIsPaying] = useState(false);
   const [pendingPaymentId, setPendingPaymentId] = useState<string | null>(null);
-  const [isPolling, setIsPolling] = useState(false);
+  const [, setIsPolling] = useState(false);
 
   // On mount, check if user already has an unused completed payment
   useEffect(() => {
