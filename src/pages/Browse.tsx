@@ -173,9 +173,9 @@ const Browse = () => {
     filters.priceRange[0] > 0 || filters.priceRange[1] < 200000 || filters.location || filters.maxDistance < 50;
 
   const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'KES',
+      currency: 'USD',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -183,8 +183,8 @@ const Browse = () => {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <SEO
-        title="Browse rentals in Kenya | Housevilla"
-        description="Search and filter rental properties across Kenya by price, bedrooms, property type and distance from your location."
+        title="Browse rentals in the USA | Housevilla"
+        description="Search and filter rental properties across the United States by price, bedrooms, property type and distance from your location."
         path="/browse"
       />
       <Navigation />
@@ -263,15 +263,15 @@ const Browse = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">Any type</SelectItem>
-                      <SelectItem value="bnb">BnB</SelectItem>
-                      <SelectItem value="bedsitter">Bedsitter</SelectItem>
-                      <SelectItem value="single-room">Single Room</SelectItem>
-                      <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
-                      <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
-                      <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
-                      <SelectItem value="maisonette">Maisonette</SelectItem>
-                      <SelectItem value="bungalow">Bungalow</SelectItem>
-                      <SelectItem value="compound-house">Compound House</SelectItem>
+                      <SelectItem value="bnb">Vacation Rental</SelectItem>
+                      <SelectItem value="bedsitter">Studio</SelectItem>
+                      <SelectItem value="single-room">Room</SelectItem>
+                      <SelectItem value="one-bedroom">1 Bedroom</SelectItem>
+                      <SelectItem value="two-bedroom">2 Bedroom</SelectItem>
+                      <SelectItem value="three-bedroom">3 Bedroom</SelectItem>
+                      <SelectItem value="maisonette">Townhouse</SelectItem>
+                      <SelectItem value="bungalow">Single-Family Home</SelectItem>
+                      <SelectItem value="compound-house">Duplex</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -346,7 +346,7 @@ const Browse = () => {
 
               {/* Monthly Rent Range */}
               <div className="mt-6 space-y-4">
-                <Label>Monthly Rent Range (KES)</Label>
+                <Label>Monthly Rent Range (USD)</Label>
                 <div className="px-3">
                   <Slider
                     min={0}
@@ -362,7 +362,7 @@ const Browse = () => {
                   </div>
                 </div>
                 <p className="text-xs text-real-estate-gray">
-                  * Price filter applies to monthly rentals only (excludes lodging and BnB properties)
+                  * Price filter applies to monthly rentals only (excludes vacation rentals)
                 </p>
               </div>
             </Card>

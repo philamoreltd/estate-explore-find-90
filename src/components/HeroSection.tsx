@@ -63,7 +63,7 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
           </h1>
           
           <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto animate-slide-up">
-            Discover thousands of rental properties available in Kenya
+            Discover thousands of rental properties available across the USA
           </p>
 
           {/* Search Bar */}
@@ -87,15 +87,15 @@ const HeroSection = ({ onSearch }: HeroSectionProps) => {
                 onChange={(e) => setPropertyType(e.target.value)}
               >
                 <option value="">Property Type</option>
-                <option value="bnb">BnB</option>
-                <option value="bedsitter">Bedsitter</option>
-                <option value="single-room">Single Room</option>
-                <option value="one-bedroom">One-Bedroom</option>
-                <option value="two-bedroom">Two-Bedroom</option>
-                <option value="three-bedroom">Three-Bedroom</option>
-                <option value="maisonette">Maisonette</option>
-                <option value="bungalow">Bungalow</option>
-                <option value="compound-house">Compound House</option>
+                <option value="bnb">Vacation Rental</option>
+                <option value="bedsitter">Studio</option>
+                <option value="single-room">Room</option>
+                <option value="one-bedroom">1 Bedroom</option>
+                <option value="two-bedroom">2 Bedroom</option>
+                <option value="three-bedroom">3 Bedroom</option>
+                <option value="maisonette">Townhouse</option>
+                <option value="bungalow">Single-Family Home</option>
+                <option value="compound-house">Duplex</option>
               </select>
               
               <Button variant="search" size="lg" className="h-12" onClick={handleSearch}>

@@ -18,15 +18,15 @@ interface PaymentModalProps {
 }
 
 const calculatePaymentAmount = (rentAmount: number): number => {
-  // 4% of the rent amount, minimum KES 10
+  // 4% of the rent amount, minimum $10
   const fee = Math.ceil(rentAmount * 0.04);
   return Math.max(fee, 10);
 };
 
 const formatPrice = (amount: number): string => {
-  return new Intl.NumberFormat("en-KE", {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "KES",
+    currency: "USD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -61,18 +61,18 @@ const PaymentModal = ({
     if (!phoneNumber.trim()) {
       toast({
         title: "Phone Number Required",
-        description: "Please enter your M-Pesa phone number.",
+        description: "Please enter your phone number.",
         variant: "destructive",
       });
       return;
     }
 
-    // Validate phone number format
+    // Validate US phone number format (10 digits, optional country code 1)
     const cleanPhone = phoneNumber.replace(/\D/g, "");
-    if (!cleanPhone.match(/^(254|0)?[7][0-9]{8}$/)) {
+    if (!cleanPhone.match(/^1?[2-9]\d{2}[2-9]\d{6}$/)) {
       toast({
         title: "Invalid Phone Number",
-        description: "Please enter a valid Kenyan phone number (e.g., 0712345678).",
+        description: "Please enter a valid US phone number (e.g., 555-123-4567).",
         variant: "destructive",
       });
       return;
@@ -96,7 +96,7 @@ const PaymentModal = ({
       if (data.success) {
         toast({
           title: "Payment Initiated",
-          description: data.message || "Please check your phone for the M-Pesa prompt.",
+          description: data.message || "Please follow the prompts to complete payment.",
         });
         
         // Poll for payment status
@@ -190,18 +190,18 @@ const PaymentModal = ({
           
           <form onSubmit={handlePayment} className="space-y-4">
             <div>
-              <Label htmlFor="phone">M-Pesa Phone Number *</Label>
+              <Label htmlFor="phone">Phone Number *</Label>
               <Input
                 id="phone"
                 type="tel"
-                placeholder="0712345678"
+                placeholder="555-123-4567"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
                 required
                 disabled={isProcessing}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Enter your M-Pesa registered phone number
+                Enter a valid US phone number
               </p>
             </div>
             
@@ -233,8 +233,7 @@ const PaymentModal = ({
           </form>
           
           <div className="text-xs text-muted-foreground text-center">
-            <p>• Secure payment via Safaricom M-Pesa</p>
-            <p>• You will receive an STK push on your phone</p>
+            <p>• Secure checkout</p>
             <p>• Contact access valid for 2 weeks after payment</p>
           </div>
         </div>

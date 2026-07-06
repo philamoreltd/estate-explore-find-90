@@ -44,7 +44,7 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
     
     const defaultCenter: [number, number] = initialLatitude && initialLongitude 
       ? [initialLongitude, initialLatitude]
-      : [36.8219, -1.2921]; // Nairobi, Kenya
+      : [-98.5795, 39.8283]; // Geographic center of the USA
 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,

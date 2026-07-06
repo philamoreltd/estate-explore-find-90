@@ -3,7 +3,7 @@ const StatsSection = () => {
     {
       number: "15K+",
       label: "Rentals Available",
-      description: "Active rental listings across Kenya"
+      description: "Active rental listings across the USA"
     },
     {
       number: "8K+",

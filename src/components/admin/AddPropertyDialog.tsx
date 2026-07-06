@@ -271,15 +271,15 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
               <Select value={formData.property_type} onValueChange={(v) => setFormData({ ...formData, property_type: v })}>
                 <SelectTrigger><SelectValue placeholder="Select type" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="bnb">BnB</SelectItem>
-                  <SelectItem value="bedsitter">Bedsitter</SelectItem>
-                  <SelectItem value="single-room">Single Room</SelectItem>
-                  <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
-                  <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
-                  <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
-                  <SelectItem value="maisonette">Maisonette</SelectItem>
-                  <SelectItem value="bungalow">Bungalow</SelectItem>
-                  <SelectItem value="compound-house">Compound House</SelectItem>
+                  <SelectItem value="bnb">Vacation Rental</SelectItem>
+                  <SelectItem value="bedsitter">Studio</SelectItem>
+                  <SelectItem value="single-room">Room</SelectItem>
+                  <SelectItem value="one-bedroom">1 Bedroom</SelectItem>
+                  <SelectItem value="two-bedroom">2 Bedroom</SelectItem>
+                  <SelectItem value="three-bedroom">3 Bedroom</SelectItem>
+                  <SelectItem value="maisonette">Townhouse</SelectItem>
+                  <SelectItem value="bungalow">Single-Family Home</SelectItem>
+                  <SelectItem value="compound-house">Duplex</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -295,16 +295,16 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Rent (KES) *</Label>
-              <Input type="number" value={formData.rent_amount} onChange={(e) => setFormData({ ...formData, rent_amount: e.target.value })} placeholder="50000" required />
+              <Label>Rent (USD) *</Label>
+              <Input type="number" value={formData.rent_amount} onChange={(e) => setFormData({ ...formData, rent_amount: e.target.value })} placeholder="1800" required />
             </div>
             <div className="space-y-2">
               <Label>Phone *</Label>
-              <Input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+254..." required />
+              <Input value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} placeholder="+1 555-123-4567" required />
             </div>
             <div className="col-span-2 space-y-2">
               <Label>Location *</Label>
-              <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="e.g., Nairobi, Kenya" required />
+              <Input value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} placeholder="e.g., Brooklyn, NY" required />
             </div>
             
             {/* GPS Coordinates Section */}
