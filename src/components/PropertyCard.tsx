@@ -119,7 +119,7 @@ const PropertyCard = ({
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-2xl font-bold text-real-estate-navy">{price}</h3>
             <div className="text-sm text-real-estate-gray">
-              {sqft > 0 && `${Math.round(parseInt(price.replace(/[Ksh,\s]/g, '')) / sqft)}/sqft`}
+              {sqft > 0 && `$${Math.round(parseInt(price.replace(/[^\d]/g, '')) / sqft)}/sqft`}
             </div>
           </div>
 
