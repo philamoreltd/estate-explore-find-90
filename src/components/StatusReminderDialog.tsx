@@ -121,9 +121,9 @@ const StatusReminderDialog = ({ userId, onStatusUpdated }: StatusReminderDialogP
     : 0;
 
   const formatPrice = (amount: number) =>
-    new Intl.NumberFormat("en-KE", {
+    new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "KES",
+      currency: "USD",
       minimumFractionDigits: 0,
     }).format(amount);
 

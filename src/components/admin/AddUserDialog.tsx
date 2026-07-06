@@ -163,7 +163,7 @@ export const AddUserDialog = ({ defaultRole, onSuccess }: AddUserDialogProps) =>
               id="phone"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              placeholder="+254..."
+              placeholder="+1 555-123-4567"
             />
           </div>
           <div className="space-y-2">

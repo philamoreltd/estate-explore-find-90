@@ -292,15 +292,15 @@ const Tenants = () => {
                     disabled={isLoading}
                   >
                     <option value="">Select property type</option>
-                    <option value="bnb">BnB</option>
-                    <option value="bedsitter">Bedsitter</option>
-                    <option value="single-room">Single Room</option>
-                    <option value="one-bedroom">One-Bedroom</option>
-                    <option value="two-bedroom">Two-Bedroom</option>
-                    <option value="three-bedroom">Three-Bedroom</option>
-                    <option value="maisonette">Maisonette</option>
-                    <option value="bungalow">Bungalow</option>
-                    <option value="compound-house">Compound House</option>
+                    <option value="bnb">Vacation Rental</option>
+                    <option value="bedsitter">Studio</option>
+                    <option value="single-room">Room</option>
+                    <option value="one-bedroom">1 Bedroom</option>
+                    <option value="two-bedroom">2 Bedroom</option>
+                    <option value="three-bedroom">3 Bedroom</option>
+                    <option value="maisonette">Townhouse</option>
+                    <option value="bungalow">Single-Family Home</option>
+                    <option value="compound-house">Duplex</option>
                   </select>
                   {errors.property_type && (
                     <p className="text-sm text-destructive mt-1">{errors.property_type}</p>
@@ -310,7 +310,7 @@ const Tenants = () => {
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <Label htmlFor="rent_amount">Monthly Rent (KSH)</Label>
+                  <Label htmlFor="rent_amount">Monthly Rent (USD)</Label>
                   <div className="relative mt-1">
                     <DollarSign className="absolute left-3 top-3 h-4 w-4 text-real-estate-gray" />
                     <Input 
@@ -319,7 +319,7 @@ const Tenants = () => {
                       type="number"
                       value={formData.rent_amount}
                       onChange={handleInputChange}
-                      placeholder="25,000"
+                      placeholder="1800"
                       className="pl-10"
                       disabled={isLoading}
                     />
@@ -338,7 +338,7 @@ const Tenants = () => {
                       name="location"
                       value={formData.location}
                       onChange={handleInputChange}
-                      placeholder="e.g., Kilimani, Nairobi"
+                      placeholder="e.g., Brooklyn, NY"
                       className="pl-10"
                       disabled={isLoading}
                     />

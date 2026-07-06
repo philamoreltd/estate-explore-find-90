@@ -190,9 +190,9 @@ const PropertyDetails = () => {
   };
 
   const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'KES',
+      currency: 'USD',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -264,14 +264,14 @@ const PropertyDetails = () => {
           address: {
             "@type": "PostalAddress",
             addressLocality: property.location,
-            addressCountry: "KE",
+            addressCountry: "US",
           },
           numberOfBedrooms: property.bedrooms,
           numberOfBathroomsTotal: property.bathrooms,
           offers: {
             "@type": "Offer",
             price: property.rent_amount,
-            priceCurrency: "KES",
+            priceCurrency: "USD",
             availability: property.status === "available" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
           },
         }}
@@ -486,7 +486,7 @@ const PropertyDetails = () => {
                       onClick={() => setShowPaymentModal(true)}
                     >
                       <Phone className="h-4 w-4 mr-2" />
-                      Pay KES {calculateContactFee(property.rent_amount).toLocaleString()} for 2 weeks access
+                      Pay ${calculateContactFee(property.rent_amount).toLocaleString()} for 2 weeks access
                     </Button>
                   ) : property.phone ? (
                     <>
@@ -560,7 +560,7 @@ const PropertyDetails = () => {
                         <span className="text-xs text-real-estate-blue ml-1">(Sign in required)</span>
                       )}
                       {user && !hasPaidForContact && (
-                        <span className="text-xs text-real-estate-blue ml-1">(KES 50 to unlock)</span>
+                        <span className="text-xs text-real-estate-blue ml-1">($50 to unlock)</span>
                       )}
                     </div>
                   )}

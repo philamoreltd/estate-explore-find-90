@@ -277,7 +277,7 @@ const Auth = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
       <SEO
-        title="Sign in to Housevilla | Rentals in Kenya"
+        title="Sign in to Housevilla | Rentals in the USA"
         description="Sign in or create an account on Housevilla to contact landlords and list your rental properties."
         path="/auth"
         noindex

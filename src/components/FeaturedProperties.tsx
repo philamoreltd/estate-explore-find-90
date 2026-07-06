@@ -190,7 +190,7 @@ const FeaturedProperties = () => {
   };
 
   const formatPrice = (amount: number) => {
-    return `Ksh ${amount.toLocaleString()}/month`;
+    return `$${amount.toLocaleString()}/month`;
   };
 
   const getPropertyImage = (property: Property) => {
@@ -321,14 +321,14 @@ const FeaturedProperties = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Any Price</SelectItem>
-                <SelectItem value="25000">Up to Ksh 25K</SelectItem>
-                <SelectItem value="50000">Up to Ksh 50K</SelectItem>
-                <SelectItem value="75000">Up to Ksh 75K</SelectItem>
-                <SelectItem value="100000">Up to Ksh 100K</SelectItem>
-                <SelectItem value="150000">Up to Ksh 150K</SelectItem>
-                <SelectItem value="200000">Up to Ksh 200K</SelectItem>
-                <SelectItem value="250000">Up to Ksh 250K</SelectItem>
-                <SelectItem value="300000">Up to Ksh 300K</SelectItem>
+                <SelectItem value="1000">Up to $1,000</SelectItem>
+                <SelectItem value="1500">Up to $1,500</SelectItem>
+                <SelectItem value="2000">Up to $2,000</SelectItem>
+                <SelectItem value="3000">Up to $3,000</SelectItem>
+                <SelectItem value="5000">Up to $5,000</SelectItem>
+                <SelectItem value="7500">Up to $7,500</SelectItem>
+                <SelectItem value="10000">Up to $10,000</SelectItem>
+                <SelectItem value="15000">Up to $15,000</SelectItem>
               </SelectContent>
             </Select>
 

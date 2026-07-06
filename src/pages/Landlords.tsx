@@ -69,9 +69,9 @@ const Landlords = () => {
 
 
   const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-KE', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'KES',
+      currency: 'USD',
       minimumFractionDigits: 0,
     }).format(amount);
   };
@@ -167,7 +167,7 @@ const Landlords = () => {
                   </p>
                 </div>
                 <div className="h-8 w-8 rounded-full bg-real-estate-blue/10 flex items-center justify-center">
-                  <span className="text-real-estate-blue font-bold">KES</span>
+                  <span className="text-real-estate-blue font-bold">USD</span>
                 </div>
               </div>
             </CardContent>

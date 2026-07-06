@@ -412,15 +412,15 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="bnb">BnB</SelectItem>
-                        <SelectItem value="bedsitter">Bedsitter</SelectItem>
-                        <SelectItem value="single-room">Single Room</SelectItem>
-                        <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
-                        <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
-                        <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
-                        <SelectItem value="maisonette">Maisonette</SelectItem>
-                        <SelectItem value="bungalow">Bungalow</SelectItem>
-                        <SelectItem value="compound-house">Compound House</SelectItem>
+                        <SelectItem value="bnb">Vacation Rental</SelectItem>
+                        <SelectItem value="bedsitter">Studio</SelectItem>
+                        <SelectItem value="single-room">Room</SelectItem>
+                        <SelectItem value="one-bedroom">1 Bedroom</SelectItem>
+                        <SelectItem value="two-bedroom">2 Bedroom</SelectItem>
+                        <SelectItem value="three-bedroom">3 Bedroom</SelectItem>
+                        <SelectItem value="maisonette">Townhouse</SelectItem>
+                        <SelectItem value="bungalow">Single-Family Home</SelectItem>
+                        <SelectItem value="compound-house">Duplex</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -461,11 +461,11 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                 name="rent_amount"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Monthly Rent (KES)</FormLabel>
+                    <FormLabel>Monthly Rent (USD)</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
-                        placeholder="50000"
+                        placeholder="1800"
                         {...field}
                         value={field.value ?? ''}
                         onChange={(e) => field.onChange(e.target.value === '' ? undefined : Number(e.target.value))}
@@ -504,7 +504,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                   <FormItem>
                     <FormLabel>Location</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g., Nairobi, Kenya" {...field} />
+                      <Input placeholder="e.g., Brooklyn, NY" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

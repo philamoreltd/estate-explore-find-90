@@ -8,8 +8,8 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
       <SEO
-        title="Housevilla — Rentals in Kenya: apartments, bedsitters & more"
-        description="Find rental homes across Kenya on Housevilla. Browse apartments, bedsitters, BnBs, maisonettes and bungalows with verified landlord contacts."
+        title="Housevilla — Rentals in the USA: apartments, studios & more"
+        description="Find rental homes across the United States on Housevilla. Browse apartments, studios, condos, townhouses and single-family homes with verified landlord contacts."
         path="/"
         jsonLd={[
           {
@@ -28,7 +28,7 @@ const Index = () => {
             "@type": "Organization",
             name: "Housevilla",
             url: "https://housevilla.co.ke/",
-            areaServed: "KE",
+            areaServed: "US",
           },
         ]}
       />
@@ -46,7 +46,7 @@ const Index = () => {
               <h3 className="text-lg font-semibold mb-4">Housevilla</h3>
               <p className="text-white/80 text-sm">
                 Your trusted partner in finding the perfect rental home. 
-                We make renting in Kenya simple and stress-free.
+                We make renting in the USA simple and stress-free.
               </p>
             </div>
             

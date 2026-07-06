@@ -221,7 +221,7 @@ const FeaturedPropertiesCarousel = () => {
   };
 
   const formatPrice = (amount: number) => {
-    return `Ksh ${amount.toLocaleString()}/month`;
+    return `$${amount.toLocaleString()}/month`;
   };
 
   const getPropertyImage = (property: Property) => {
@@ -308,7 +308,7 @@ const FeaturedPropertiesCarousel = () => {
               Find Your Dream Home
             </h1>
             <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto drop-shadow-md">
-              Discover exceptional rental properties in Kenya
+              Discover exceptional rental properties across the USA
             </p>
           </div>
         </div>
@@ -430,15 +430,15 @@ const FeaturedPropertiesCarousel = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="bnb">BnB</SelectItem>
-                  <SelectItem value="bedsitter">Bedsitter</SelectItem>
-                  <SelectItem value="single-room">Single Room</SelectItem>
-                  <SelectItem value="one-bedroom">One-Bedroom</SelectItem>
-                  <SelectItem value="two-bedroom">Two-Bedroom</SelectItem>
-                  <SelectItem value="three-bedroom">Three-Bedroom</SelectItem>
-                  <SelectItem value="maisonette">Maisonette</SelectItem>
-                  <SelectItem value="bungalow">Bungalow</SelectItem>
-                  <SelectItem value="compound-house">Compound House</SelectItem>
+                  <SelectItem value="bnb">Vacation Rental</SelectItem>
+                  <SelectItem value="bedsitter">Studio</SelectItem>
+                  <SelectItem value="single-room">Room</SelectItem>
+                  <SelectItem value="one-bedroom">1 Bedroom</SelectItem>
+                  <SelectItem value="two-bedroom">2 Bedroom</SelectItem>
+                  <SelectItem value="three-bedroom">3 Bedroom</SelectItem>
+                  <SelectItem value="maisonette">Townhouse</SelectItem>
+                  <SelectItem value="bungalow">Single-Family Home</SelectItem>
+                  <SelectItem value="compound-house">Duplex</SelectItem>
                 </SelectContent>
               </Select>
 
@@ -449,12 +449,12 @@ const FeaturedPropertiesCarousel = () => {
                 </SelectTrigger>
                 <SelectContent className="bg-popover z-50">
                   <SelectItem value="all">Any Price</SelectItem>
-                  <SelectItem value="25000">Up to Ksh 25K</SelectItem>
-                  <SelectItem value="50000">Up to Ksh 50K</SelectItem>
-                  <SelectItem value="75000">Up to Ksh 75K</SelectItem>
-                  <SelectItem value="100000">Up to Ksh 100K</SelectItem>
-                  <SelectItem value="150000">Up to Ksh 150K</SelectItem>
-                  <SelectItem value="200000">Up to Ksh 200K</SelectItem>
+                  <SelectItem value="1000">Up to $1,000</SelectItem>
+                  <SelectItem value="1500">Up to $1,500</SelectItem>
+                  <SelectItem value="2000">Up to $2,000</SelectItem>
+                  <SelectItem value="3000">Up to $3,000</SelectItem>
+                  <SelectItem value="5000">Up to $5,000</SelectItem>
+                  <SelectItem value="10000">Up to $10,000</SelectItem>
                 </SelectContent>
               </Select>
 

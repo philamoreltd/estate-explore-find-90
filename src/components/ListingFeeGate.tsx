@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
-import { Loader2, CheckCircle2, KeyRound, Smartphone } from "lucide-react";
+import { Loader2, CheckCircle2, KeyRound } from "lucide-react";
 
 interface ListingFeeGateProps {
   rentAmount: number;
@@ -105,46 +105,6 @@ const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: Listing
     }
   };
 
-  const initiatePayment = async () => {
-    if (!rentAmount || rentAmount <= 0) {
-      toast({
-        title: "Set rent first",
-        description: "Enter the monthly rent before paying the listing fee.",
-        variant: "destructive",
-      });
-      return;
-    }
-    if (!phoneNumber) {
-      toast({
-        title: "Phone required",
-        description: "Enter your M-Pesa phone number above.",
-        variant: "destructive",
-      });
-      return;
-    }
-    setIsPaying(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("listing-fee-payment", {
-        body: { rentAmount, phoneNumber },
-      });
-      if (error) throw error;
-      if (!data?.success) throw new Error(data?.error || "Payment failed to start");
-      setPendingPaymentId(data.paymentId);
-      toast({
-        title: "Check your phone",
-        description: `Enter your M-Pesa PIN to pay KES ${data.amount}.`,
-      });
-    } catch (e) {
-      toast({
-        title: "Payment error",
-        description: (e as Error).message,
-        variant: "destructive",
-      });
-    } finally {
-      setIsPaying(false);
-    }
-  };
-
   const fee = calcFee(rentAmount);
 
   if (cleared) {
@@ -173,16 +133,16 @@ const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: Listing
       <CardHeader className="pb-3">
         <CardTitle className="text-base flex items-center justify-between">
           <span>Listing fee</span>
-          <span className="text-primary">KES {fee.toLocaleString()}</span>
+          <span className="text-primary">${fee.toLocaleString()}</span>
         </CardTitle>
         <p className="text-xs text-muted-foreground">
-          Pay via M-Pesa or enter an admin code.
+          Enter an admin code to publish your listing.
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <label className="text-xs font-medium flex items-center gap-1">
-            <KeyRound className="h-3 w-3" /> Admin code (optional)
+            <KeyRound className="h-3 w-3" /> Admin code
           </label>
           <div className="flex gap-2">
             <Input
@@ -201,25 +161,10 @@ const ListingFeeGate = ({ rentAmount, phoneNumber, cleared, onCleared }: Listing
               Apply
             </Button>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Don't have a code? Contact an administrator to request one.
+          </p>
         </div>
-
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">or</span>
-          </div>
-        </div>
-
-        <Button
-          type="button"
-          className="w-full"
-          onClick={initiatePayment}
-          disabled={isPaying || isPolling || !rentAmount}
-        >
-          {(isPaying || isPolling) && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-          <Smartphone className="h-4 w-4 mr-2" />
-          {isPolling ? "Waiting for M-Pesa..." : `Pay KES ${fee.toLocaleString()} via M-Pesa`}
-        </Button>
       </CardContent>
     </Card>
   );
