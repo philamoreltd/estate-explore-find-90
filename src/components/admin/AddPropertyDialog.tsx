@@ -355,7 +355,7 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
                     step="any"
                     value={formData.latitude}
                     onChange={(e) => setFormData({ ...formData, latitude: e.target.value })}
-                    placeholder="-1.2921"
+                    placeholder="40.7128"
                   />
                 </div>
                 <div className="space-y-1">
@@ -365,7 +365,7 @@ export const AddPropertyDialog = ({ landlords, onSuccess }: AddPropertyDialogPro
                     step="any"
                     value={formData.longitude}
                     onChange={(e) => setFormData({ ...formData, longitude: e.target.value })}
-                    placeholder="36.8219"
+                    placeholder="-74.0060"
                   />
                 </div>
               </div>
