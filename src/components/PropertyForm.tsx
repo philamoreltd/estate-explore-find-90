@@ -560,7 +560,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                           <Input
                             type="number"
                             step="any"
-                            placeholder="-1.2921"
+                            placeholder="40.7128"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
@@ -580,7 +580,7 @@ const PropertyForm = ({ propertyId, onSuccess, onCancel }: PropertyFormProps) =>
                           <Input
                             type="number"
                             step="any"
-                            placeholder="36.8219"
+                            placeholder="-74.0060"
                             {...field}
                             value={field.value ?? ''}
                             onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : undefined)}
