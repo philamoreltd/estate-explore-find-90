@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -166,6 +166,84 @@ export type Database = {
         }
         Relationships: []
       }
+      products: {
+        Row: {
+          brand: string
+          category: string
+          condition: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          featured: boolean
+          graphics: string | null
+          id: string
+          image_url: string | null
+          image_urls: string[] | null
+          name: string
+          operating_system: string | null
+          original_price: number | null
+          price: number
+          processor: string | null
+          ram: string | null
+          screen_size: string | null
+          sort_order: number
+          stock_status: string
+          storage: string | null
+          updated_at: string
+          warranty_months: number | null
+        }
+        Insert: {
+          brand?: string
+          category?: string
+          condition?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          featured?: boolean
+          graphics?: string | null
+          id?: string
+          image_url?: string | null
+          image_urls?: string[] | null
+          name: string
+          operating_system?: string | null
+          original_price?: number | null
+          price: number
+          processor?: string | null
+          ram?: string | null
+          screen_size?: string | null
+          sort_order?: number
+          stock_status?: string
+          storage?: string | null
+          updated_at?: string
+          warranty_months?: number | null
+        }
+        Update: {
+          brand?: string
+          category?: string
+          condition?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          featured?: boolean
+          graphics?: string | null
+          id?: string
+          image_url?: string | null
+          image_urls?: string[] | null
+          name?: string
+          operating_system?: string | null
+          original_price?: number | null
+          price?: number
+          processor?: string | null
+          ram?: string | null
+          screen_size?: string | null
+          sort_order?: number
+          stock_status?: string
+          storage?: string | null
+          updated_at?: string
+          warranty_months?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -311,6 +389,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shop_settings: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          opening_hours: string | null
+          phone_number: string
+          shop_name: string
+          updated_at: string
+          whatsapp_number: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          opening_hours?: string | null
+          phone_number?: string
+          shop_name?: string
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          opening_hours?: string | null
+          phone_number?: string
+          shop_name?: string
+          updated_at?: string
+          whatsapp_number?: string
+        }
+        Relationships: []
       }
       user_roles: {
         Row: {
