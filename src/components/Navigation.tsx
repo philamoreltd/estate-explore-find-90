@@ -1,27 +1,35 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Heart, User, Menu, LogOut, X } from "lucide-react";
+import { Laptop, LogOut, Menu, MessageCircle, User, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useShopSettings } from "@/hooks/useShopSettings";
 import { useToast } from "@/hooks/use-toast";
-import housevillaLogo from "@/assets/housevilla-logo.png";
+import { enquiryMessage, whatsappLink } from "@/lib/shop";
+
+const links = [
+  { label: "Home", path: "/" },
+  { label: "Laptops", path: "/shop?category=laptops" },
+  { label: "Accessories", path: "/shop?category=accessories" },
+  { label: "All Products", path: "/shop" },
+  { label: "Contact", path: "/contact" },
+];
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
+  const { settings } = useShopSettings();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      toast({
-        title: "Signed out successfully",
-        description: "You have been signed out of your account.",
-      });
+      toast({ title: "Signed out", description: "You have been signed out." });
       navigate("/");
-    } catch (error) {
-      console.error("Sign out error:", error);
+    } catch {
       toast({
         title: "Error",
         description: "Failed to sign out. Please try again.",
@@ -30,174 +38,138 @@ const Navigation = () => {
     }
   };
 
-  const handleMobileNavigation = (path: string) => {
+  const go = (path: string) => {
     navigate(path);
     setIsMobileMenuOpen(false);
   };
+
   return (
-    <nav className="bg-white shadow-card border-b border-real-estate-gray/10 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <div className="flex items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <img src={housevillaLogo} alt="Housevilla" className="h-10 w-10 mr-2" />
-              <span className="text-xl font-bold text-foreground">Housevilla</span>
-            </div>
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/95 shadow-card backdrop-blur">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <Laptop className="h-5 w-5" />
+            </span>
+            <span className="text-lg font-bold text-foreground">
+              {settings.shop_name}
+            </span>
+          </Link>
+
+          <div className="hidden md:flex items-center gap-6">
+            {links.map((link) => (
+              <Link
+                key={link.label}
+                to={link.path}
+                className="text-sm font-medium text-foreground/80 transition-colors hover:text-primary"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-8">
-              <a href="/" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Home
-              </a>
-              <a href="/browse" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Browse Rentals
-              </a>
-              <a href="/add-property" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Add Property
-              </a>
-              <a href="/landlords" className="text-real-estate-navy hover:text-real-estate-blue transition-colors duration-200 px-3 py-2 text-sm font-medium">
-                Landlords
-              </a>
-            </div>
-          </div>
-
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost" size="sm">
-              <Heart className="h-4 w-4 mr-2" />
-              Saved
-            </Button>
+          <div className="hidden md:flex items-center gap-3">
             {user ? (
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-real-estate-navy">
-                  Hello, {user.user_metadata?.full_name || user.email}
-                </span>
-                {user.email === 'antonygmurimi@gmail.com' && (
+              <>
+                {isAdmin && (
                   <Button variant="ghost" size="sm" onClick={() => navigate("/admin")}>
-                    Admin Panel
+                    Admin
                   </Button>
                 )}
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
-                  <LogOut className="h-4 w-4 mr-2" />
+                  <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
-              </div>
+              </>
             ) : (
               <Button variant="outline" size="sm" onClick={() => navigate("/auth")}>
-                <User className="h-4 w-4 mr-2" />
+                <User className="mr-2 h-4 w-4" />
                 Sign In
               </Button>
             )}
-            <Button variant="hero" size="sm" onClick={() => navigate("/add-property")}>
-              List Rental
+            <Button asChild size="sm">
+              <a
+                href={whatsappLink(settings.whatsapp_number, enquiryMessage())}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <MessageCircle className="mr-2 h-4 w-4" />
+                WhatsApp Us
+              </a>
             </Button>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden">
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               aria-expanded={isMobileMenuOpen}
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
-              {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Menu Panel */}
         {isMobileMenuOpen && (
-          <div className="md:hidden border-t border-real-estate-gray/10">
-            <div className="px-2 pt-2 pb-3 space-y-1 bg-white">
-              {/* Mobile Navigation Links */}
-              <button
-                onClick={() => handleMobileNavigation('/')}
-                className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
-              >
-                Home
-              </button>
-              <button
-                onClick={() => handleMobileNavigation('/browse')}
-                className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
-              >
-                Browse Rentals
-              </button>
-              <button
-                onClick={() => handleMobileNavigation('/add-property')}
-                className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
-              >
-                Add Property
-              </button>
-              <button
-                onClick={() => handleMobileNavigation('/landlords')}
-                className="block w-full text-left px-3 py-2 text-real-estate-navy hover:text-real-estate-blue hover:bg-gray-50 transition-colors duration-200 text-base font-medium"
-              >
-                Landlords
-              </button>
-              
-              {/* Mobile Actions */}
-              <div className="border-t border-real-estate-gray/10 pt-4 mt-4 space-y-2">
-                <Button variant="ghost" size="sm" className="w-full justify-start">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Saved
-                </Button>
-                
+          <div className="border-t border-border md:hidden">
+            <div className="space-y-1 py-3">
+              {links.map((link) => (
+                <button
+                  key={link.label}
+                  onClick={() => go(link.path)}
+                  className="block w-full px-3 py-2 text-left text-base font-medium text-foreground/90 hover:bg-muted"
+                >
+                  {link.label}
+                </button>
+              ))}
+              <div className="mt-3 space-y-2 border-t border-border pt-3">
                 {user ? (
-                  <div className="space-y-2">
-                    <div className="px-3 py-2 text-sm text-real-estate-navy border-b border-real-estate-gray/10">
-                      Hello, {user.user_metadata?.full_name || user.email}
-                    </div>
-                    {user.email === 'antonygmurimi@gmail.com' && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
+                  <>
+                    {isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
                         className="w-full justify-start"
-                        onClick={() => handleMobileNavigation("/admin")}
+                        onClick={() => go("/admin")}
                       >
-                        Admin Panel
+                        Admin
                       </Button>
                     )}
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
+                    <Button
+                      variant="outline"
+                      size="sm"
                       className="w-full justify-start"
                       onClick={() => {
                         handleSignOut();
                         setIsMobileMenuOpen(false);
                       }}
                     >
-                      <LogOut className="h-4 w-4 mr-2" />
+                      <LogOut className="mr-2 h-4 w-4" />
                       Sign Out
                     </Button>
-                  </div>
+                  </>
                 ) : (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="w-full justify-start"
-                    onClick={() => handleMobileNavigation("/auth")}
+                    onClick={() => go("/auth")}
                   >
-                    <User className="h-4 w-4 mr-2" />
+                    <User className="mr-2 h-4 w-4" />
                     Sign In
                   </Button>
                 )}
-                
-                <Button 
-                  variant="hero" 
-                  size="sm" 
-                  className="w-full"
-                  onClick={() => handleMobileNavigation("/add-property")}
-                >
-                  List Rental
+                <Button asChild size="sm" className="w-full">
+                  <a
+                    href={whatsappLink(settings.whatsapp_number, enquiryMessage())}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    WhatsApp Us
+                  </a>
                 </Button>
               </div>
             </div>
