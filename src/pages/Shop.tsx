@@ -21,9 +21,9 @@ import {
 import { Search } from "lucide-react";
 import { BRANDS, CATEGORIES, CONDITIONS, Product } from "@/lib/shop";
 
-const ACCESSORY_CATEGORIES = CATEGORIES.filter((c) => c.value !== "laptops").map(
-  (c) => c.value
-);
+const ACCESSORY_CATEGORIES: string[] = CATEGORIES.filter(
+  (c) => c.value !== "laptops"
+).map((c) => c.value);
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
