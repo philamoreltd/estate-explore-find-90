@@ -553,44 +553,8 @@ const Auth = () => {
                   )}
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="signup-role">Account Type</Label>
-                  <Select 
-                    value={signUpData.role} 
-                    onValueChange={(value) => setSignUpData({ ...signUpData, role: value })}
-                    disabled={isLoading}
-                  >
-                    <SelectTrigger>
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-muted-foreground" />
-                        <SelectValue placeholder="Choose your account type" />
-                      </div>
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="tenant">
-                        <div className="flex items-center gap-2">
-                          <User className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium">Tenant</div>
-                            <div className="text-sm text-muted-foreground">Looking for rental properties</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="landlord">
-                        <div className="flex items-center gap-2">
-                          <Home className="h-4 w-4" />
-                          <div>
-                            <div className="font-medium">Landlord</div>
-                            <div className="text-sm text-muted-foreground">Listing rental properties</div>
-                          </div>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {errors.role && (
-                    <p className="text-sm text-destructive">{errors.role}</p>
-                  )}
-                </div>
+
+
                 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
