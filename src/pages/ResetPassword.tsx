@@ -95,7 +95,7 @@ const ResetPassword = () => {
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <Home className="h-8 w-8 text-real-estate-blue mr-2" />
-            <span className="text-xl font-bold text-foreground">Housevilla</span>
+            <span className="text-xl font-bold text-foreground">Laptop Hub Kenya</span>
           </div>
           <CardTitle className="text-center">Reset Password</CardTitle>
           <CardDescription className="text-center">

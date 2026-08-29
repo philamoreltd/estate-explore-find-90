@@ -25,7 +25,7 @@ const Auth = () => {
     fullName: "",
     phone: "",
     confirmPassword: "",
-    role: ""
+    role: "user"
   });
   const [signInData, setSignInData] = useState({
     email: "",
@@ -66,8 +66,7 @@ const Auth = () => {
       newErrors.phone = "Please enter a valid phone number";
     }
 
-    if (!signUpData.role) {
-      newErrors.role = "Please select your account type";
+    if (false) {
     }
     
     if (!signUpData.password) {
@@ -144,7 +143,7 @@ const Auth = () => {
         fullName: "",
         phone: "",
         confirmPassword: "",
-        role: ""
+        role: "user"
       });
       
     } catch (error: any) {
@@ -277,17 +276,17 @@ const Auth = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
       <SEO
-        title="Sign in to Housevilla | Rentals in the USA"
-        description="Sign in or create an account on Housevilla to contact landlords and list your rental properties."
+        title="Sign in | Laptop Hub Kenya"
+        description="Sign in or create an account on Laptop Hub Kenya to manage shop stock and orders."
         path="/auth"
         noindex
       />
-      <h1 className="sr-only">Sign in to Housevilla</h1>
+      <h1 className="sr-only">Sign in to Laptop Hub Kenya</h1>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <Home className="h-8 w-8 text-real-estate-blue mr-2" />
-            <span className="text-xl font-bold text-foreground">Housevilla</span>
+            <span className="text-xl font-bold text-foreground">Laptop Hub Kenya</span>
           </div>
           <CardTitle className="text-center">Welcome</CardTitle>
           <CardDescription className="text-center">
