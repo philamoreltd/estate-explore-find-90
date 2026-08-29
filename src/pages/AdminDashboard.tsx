@@ -1,787 +1,340 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Users, 
-  Home, 
-  Eye, 
-  Edit,
-  Trash2, 
-  MapPin, 
-  Calendar,
-  DollarSign,
-  Activity,
-  UserCheck,
-  Building,
-  Shield,
-  User,
-  Clock
-} from "lucide-react";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
 import BottomNavigation from "@/components/BottomNavigation";
-import { useAuth } from "@/contexts/AuthContext";
+import SEO from "@/components/SEO";
+import ProductFormDialog from "@/components/admin/ProductFormDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
-import { AddUserDialog } from "@/components/admin/AddUserDialog";
-import { AddPropertyDialog } from "@/components/admin/AddPropertyDialog";
-import { ActivityLogs } from "@/components/admin/ActivityLogs";
-import { ListingCodesManager } from "@/components/admin/ListingCodesManager";
-
-interface UserData {
-  id: string;
-  user_id: string;
-  email: string;
-  full_name: string;
-  phone: string;
-  created_at: string;
-  role?: string;
-  is_active?: boolean;
-}
-
-interface Property {
-  id: string;
-  title: string;
-  property_type: string;
-  rent_amount: number;
-  location: string;
-  bedrooms: number;
-  bathrooms: number;
-  status: string;
-  created_at: string;
-  user_id: string;
-  profiles: {
-    full_name: string;
-    email: string;
-  } | null;
-}
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Product,
+  categoryLabel,
+  conditionLabel,
+  formatKES,
+  productImage,
+  stockLabel,
+} from "@/lib/shop";
+import { useShopSettings } from "@/hooks/useShopSettings";
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
+  const { isAdmin, isLoading: checkingAdmin } = useIsAdmin();
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [users, setUsers] = useState<UserData[]>([]);
-  const [properties, setProperties] = useState<Property[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const queryClient = useQueryClient();
+  const { settings } = useShopSettings();
 
-  useEffect(() => {
-    checkAdminAccess();
-  }, [user]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState<Product | null>(null);
+  const [deleting, setDeleting] = useState<Product | null>(null);
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsForm, setSettingsForm] = useState<Record<string, string> | null>(null);
 
-  const checkAdminAccess = async () => {
-    if (!user) {
-      navigate('/auth');
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["admin-products"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as Product[];
+    },
+  });
+
+  const refresh = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+    queryClient.invalidateQueries({ queryKey: ["products"] });
+    queryClient.invalidateQueries({ queryKey: ["featured-products"] });
+  };
+
+  const handleDelete = async () => {
+    if (!deleting) return;
+    const { error } = await supabase.from("products").delete().eq("id", deleting.id);
+    if (error) {
+      toast({ title: "Could not delete", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Product deleted", description: `${deleting.name} was removed.` });
+      refresh();
+    }
+    setDeleting(null);
+  };
+
+  const form = settingsForm ?? {
+    shop_name: settings.shop_name,
+    whatsapp_number: settings.whatsapp_number,
+    phone_number: settings.phone_number,
+    email: settings.email ?? "",
+    address: settings.address ?? "",
+    opening_hours: settings.opening_hours ?? "",
+  };
+
+  const saveSettings = async () => {
+    if (!settings.id) return;
+    setSavingSettings(true);
+    const { error } = await supabase
+      .from("shop_settings")
+      .update({
+        shop_name: form.shop_name,
+        whatsapp_number: form.whatsapp_number,
+        phone_number: form.phone_number,
+        email: form.email || null,
+        address: form.address || null,
+        opening_hours: form.opening_hours || null,
+      })
+      .eq("id", settings.id);
+    setSavingSettings(false);
+
+    if (error) {
+      toast({ title: "Could not save", description: error.message, variant: "destructive" });
       return;
     }
-
-    try {
-      const { data: roleData, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .single();
-
-      if (error || !roleData) {
-        toast({
-          title: "Access Denied",
-          description: "You don't have admin privileges to access this page.",
-          variant: "destructive",
-        });
-        navigate('/');
-        return;
-      }
-
-      setIsAdmin(true);
-      fetchDashboardData();
-    } catch (error) {
-      console.error('Error checking admin access:', error);
-      navigate('/');
-    }
+    toast({ title: "Shop details saved" });
+    queryClient.invalidateQueries({ queryKey: ["shop-settings"] });
   };
 
-  const fetchDashboardData = async () => {
-    try {
-      // Fetch all users from profiles table
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*');
-
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-      } else {
-        // Fetch roles for each user
-        const usersWithRoles = await Promise.all(
-          (profilesData || []).map(async (profile) => {
-            const { data: roleData } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', profile.user_id)
-              .single();
-            
-            return {
-              ...profile,
-              role: roleData?.role || 'user'
-            };
-          })
-        );
-        setUsers(usersWithRoles);
-      }
-
-      // Fetch all properties without the join first
-      const { data: propertiesData, error: propertiesError } = await supabase
-        .rpc('get_properties_with_conditional_phone')
-        .order('created_at', { ascending: false });
-
-      if (propertiesError) {
-        console.error('Error fetching properties:', propertiesError);
-      } else {
-        // Fetch profile data for each property owner
-        const propertiesWithProfiles = await Promise.all(
-          (propertiesData || []).map(async (property) => {
-            const { data: profileData } = await supabase
-              .from('profiles')
-              .select('full_name, email')
-              .eq('user_id', property.user_id)
-              .single();
-            
-            return {
-              ...property,
-              profiles: profileData || null
-            };
-          })
-        );
-        setProperties(propertiesWithProfiles);
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logActivity = async (action: string, entityType: string, entityId?: string, details?: Record<string, string>) => {
-    if (!user) return;
-    try {
-      await supabase.from('activity_logs').insert([{
-        staff_id: user.id,
-        action_type: action,
-        entity_type: entityType,
-        entity_id: entityId || null,
-        details: details as any || null,
-      }]);
-    } catch (error) {
-      console.error('Error logging activity:', error);
-    }
-  };
-
-  const updateUserRole = async (userId: string, newRole: string) => {
-    try {
-      // Get user info for logging
-      const targetUser = users.find(u => u.user_id === userId);
-      
-      // First, remove existing role
-      await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', userId);
-
-      // Then add new role
-      const { error } = await supabase
-        .from('user_roles')
-        .insert([{ 
-          user_id: userId, 
-          role: newRole as 'admin' | 'landlord' | 'tenant' | 'user', 
-          assigned_by: user?.id 
-        }]);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to update user role.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Log the activity
-      await logActivity('updated_role', newRole, userId, {
-        email: targetUser?.email || '',
-        full_name: targetUser?.full_name || '',
-        role: newRole,
-      });
-
-      toast({
-        title: "Success",
-        description: "User role updated successfully.",
-      });
-
-      fetchDashboardData();
-    } catch (error) {
-      console.error('Error updating user role:', error);
-    }
-  };
-
-  const toggleUserActive = async (userId: string, currentStatus: boolean) => {
-    try {
-      const targetUser = users.find(u => u.user_id === userId);
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({ is_active: !currentStatus })
-        .eq('user_id', userId);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to update user status.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Log the activity
-      await logActivity(
-        currentStatus ? 'deactivated_user' : 'activated_user', 
-        'user', 
-        userId, 
-        {
-          email: targetUser?.email || '',
-          full_name: targetUser?.full_name || '',
-        }
-      );
-
-      toast({
-        title: "Success",
-        description: `User ${currentStatus ? 'deactivated' : 'activated'} successfully.`,
-      });
-
-      fetchDashboardData();
-    } catch (error) {
-      console.error('Error updating user status:', error);
-    }
-  };
-
-  const deleteProperty = async (propertyId: string) => {
-    if (!confirm('Are you sure you want to delete this property?')) return;
-
-    try {
-      // Get property info for logging
-      const targetProperty = properties.find(p => p.id === propertyId);
-
-      const { error } = await supabase
-        .from('properties')
-        .delete()
-        .eq('id', propertyId);
-
-      if (error) {
-        toast({
-          title: "Error",
-          description: "Failed to delete property.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Log the activity
-      await logActivity('deleted_property', 'property', propertyId, {
-        title: targetProperty?.title || '',
-        location: targetProperty?.location || '',
-      });
-
-      toast({
-        title: "Success",
-        description: "Property deleted successfully.",
-      });
-
-      fetchDashboardData();
-    } catch (error) {
-      console.error('Error deleting property:', error);
-    }
-  };
-
-  const formatPrice = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  const getRoleColor = (role?: string) => {
-    switch (role) {
-      case 'admin': return 'bg-red-100 text-red-800';
-      case 'landlord': return 'bg-blue-100 text-blue-800';
-      case 'tenant': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'bg-green-100 text-green-800';
-      case 'rented': return 'bg-blue-100 text-blue-800';
-      case 'maintenance': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  if (!isAdmin || isLoading) {
+  if (checkingAdmin) {
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-real-estate-blue mx-auto"></div>
-            <p className="mt-4 text-real-estate-gray">Loading dashboard...</p>
-          </div>
-        </div>
+        <main className="mx-auto max-w-6xl px-4 py-10">
+          <Skeleton className="h-64 w-full" />
+        </main>
       </div>
     );
   }
 
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-background pb-16 md:pb-0">
+        <SEO title="Admin | Laptop Hub Kenya" description="Shop administration." path="/admin" noindex />
+        <Navigation />
+        <main className="mx-auto max-w-3xl px-4 py-20 text-center">
+          <h1 className="text-2xl font-bold">Admins only</h1>
+          <p className="mt-2 text-muted-foreground">
+            This area is for shop staff. If you are a customer, browse our stock instead.
+          </p>
+          <Button asChild className="mt-6">
+            <Link to="/shop">Go to shop</Link>
+          </Button>
+        </main>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  const outOfStock = (products ?? []).filter((p) => p.stock_status === "out_of_stock").length;
+
   return (
     <div className="min-h-screen bg-background pb-16 md:pb-0">
+      <SEO title="Admin | Laptop Hub Kenya" description="Manage shop stock." path="/admin" noindex />
       <Navigation />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-real-estate-navy mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-real-estate-gray">
-            Monitor and manage all platform activities
-          </p>
+
+      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold sm:text-3xl">Shop admin</h1>
+            <p className="text-sm text-muted-foreground">
+              Manage laptops, accessories and shop contact details.
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              setEditing(null);
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add product
+          </Button>
         </div>
 
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Total Users</p>
-                  <p className="text-xl font-bold text-foreground">{users.length}</p>
-                </div>
-                <Users className="h-6 w-6 text-primary" />
-              </div>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Total products</CardTitle></CardHeader>
+            <CardContent className="text-2xl font-bold">{products?.length ?? 0}</CardContent>
+          </Card>
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Featured</CardTitle></CardHeader>
+            <CardContent className="text-2xl font-bold">
+              {(products ?? []).filter((p) => p.featured).length}
             </CardContent>
           </Card>
-          
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Landlords</p>
-                  <p className="text-xl font-bold text-blue-600">
-                    {users.filter(u => u.role === 'landlord').length}
-                  </p>
-                </div>
-                <Building className="h-6 w-6 text-blue-600" />
-              </div>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Laptops</CardTitle></CardHeader>
+            <CardContent className="text-2xl font-bold">
+              {(products ?? []).filter((p) => p.category === "laptops").length}
             </CardContent>
           </Card>
-          
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Tenants</p>
-                  <p className="text-xl font-bold text-green-600">
-                    {users.filter(u => u.role === 'tenant').length}
-                  </p>
-                </div>
-                <User className="h-6 w-6 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Staff</p>
-                  <p className="text-xl font-bold text-purple-600">
-                    {users.filter(u => u.role === 'admin').length}
-                  </p>
-                </div>
-                <Shield className="h-6 w-6 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Properties</p>
-                  <p className="text-xl font-bold text-orange-600">{properties.length}</p>
-                </div>
-                <Home className="h-6 w-6 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-muted-foreground">Available</p>
-                  <p className="text-xl font-bold text-teal-600">
-                    {properties.filter(p => p.status === 'available').length}
-                  </p>
-                </div>
-                <Activity className="h-6 w-6 text-teal-600" />
-              </div>
-            </CardContent>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">Out of stock</CardTitle></CardHeader>
+            <CardContent className="text-2xl font-bold">{outOfStock}</CardContent>
           </Card>
         </div>
 
-        {/* Tabs for different views */}
-        <Tabs defaultValue="landlords" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
-            <TabsTrigger value="landlords">Landlords</TabsTrigger>
-            <TabsTrigger value="tenants">Tenants</TabsTrigger>
-            <TabsTrigger value="staff">Staff</TabsTrigger>
-            <TabsTrigger value="properties">Properties</TabsTrigger>
-            <TabsTrigger value="activity">Activity</TabsTrigger>
-            <TabsTrigger value="codes">Codes</TabsTrigger>
-            <TabsTrigger value="payments" onClick={() => navigate('/admin/payments')}>Payments</TabsTrigger>
+        <Tabs defaultValue="products" className="mt-8">
+          <TabsList>
+            <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="settings">Shop details</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="landlords" className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5 text-blue-600" />
-                    Landlords ({users.filter(u => u.role === 'landlord').length})
-                  </CardTitle>
-                  <CardDescription>
-                    Manage registered landlords
-                  </CardDescription>
+          <TabsContent value="products" className="mt-6">
+            {isLoading ? (
+              <Skeleton className="h-64 w-full" />
+            ) : (products ?? []).length === 0 ? (
+              <Card className="p-10 text-center text-muted-foreground">
+                No products yet. Use “Add product” to list your first laptop.
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {(products ?? []).map((product) => (
+                  <Card key={product.id} className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center">
+                    <img
+                      src={productImage(product)}
+                      alt={product.name}
+                      loading="lazy"
+                      className="h-20 w-28 shrink-0 rounded object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <h2 className="truncate font-semibold">{product.name}</h2>
+                      <p className="text-xs text-muted-foreground">
+                        {product.brand} · {categoryLabel(product.category)} ·{" "}
+                        {conditionLabel(product.condition)}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <span className="font-semibold text-primary">
+                          {formatKES(Number(product.price))}
+                        </span>
+                        <Badge variant="outline">{stockLabel(product.stock_status)}</Badge>
+                        {product.featured && <Badge>Featured</Badge>}
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setEditing(product);
+                          setDialogOpen(true);
+                        }}
+                      >
+                        <Pencil className="mr-1 h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => setDeleting(product)}
+                        aria-label={`Delete ${product.name}`}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="settings" className="mt-6">
+            <Card className="max-w-2xl p-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Shop name</Label>
+                  <Input
+                    value={form.shop_name}
+                    onChange={(e) => setSettingsForm({ ...form, shop_name: e.target.value })}
+                  />
                 </div>
-                <AddUserDialog defaultRole="landlord" onSuccess={fetchDashboardData} />
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-4">Name</th>
-                        <th className="text-left p-4">Email</th>
-                        <th className="text-left p-4">Phone</th>
-                        <th className="text-left p-4">Status</th>
-                        <th className="text-left p-4">Joined</th>
-                        <th className="text-left p-4">Role</th>
-                        <th className="text-left p-4">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.filter(u => u.role === 'landlord').map((userData) => (
-                        <tr key={userData.id} className="border-b hover:bg-muted/50">
-                          <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
-                          <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
-                          <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
-                          <td className="p-4">
-                            <Badge className={userData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                              {userData.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </td>
-                          <td className="p-4 text-sm text-muted-foreground">
-                            {new Date(userData.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="p-4">
-                            <select
-                              value={userData.role}
-                              onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
-                              className="text-xs border rounded px-2 py-1 bg-background"
-                            >
-                              <option value="user">User</option>
-                              <option value="tenant">Tenant</option>
-                              <option value="landlord">Landlord</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </td>
-                          <td className="p-4">
-                            <Button
-                              size="sm"
-                              variant={userData.is_active ? "outline" : "default"}
-                              onClick={() => toggleUserActive(userData.user_id, userData.is_active || false)}
-                              className={userData.is_active ? "text-destructive hover:text-destructive" : ""}
-                            >
-                              {userData.is_active ? 'Deactivate' : 'Activate'}
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                      {users.filter(u => u.role === 'landlord').length === 0 && (
-                        <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No landlords registered</td></tr>
-                      )}
-                    </tbody>
-                  </table>
+                <div className="space-y-2">
+                  <Label>WhatsApp number (254...)</Label>
+                  <Input
+                    value={form.whatsapp_number}
+                    onChange={(e) => setSettingsForm({ ...form, whatsapp_number: e.target.value })}
+                    placeholder="254712345678"
+                  />
                 </div>
-              </CardContent>
+                <div className="space-y-2">
+                  <Label>Phone number</Label>
+                  <Input
+                    value={form.phone_number}
+                    onChange={(e) => setSettingsForm({ ...form, phone_number: e.target.value })}
+                    placeholder="+254 712 345 678"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input
+                    value={form.email}
+                    onChange={(e) => setSettingsForm({ ...form, email: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Shop address</Label>
+                  <Input
+                    value={form.address}
+                    onChange={(e) => setSettingsForm({ ...form, address: e.target.value })}
+                    placeholder="Moi Avenue, Nairobi CBD"
+                  />
+                </div>
+                <div className="space-y-2 sm:col-span-2">
+                  <Label>Opening hours</Label>
+                  <Input
+                    value={form.opening_hours}
+                    onChange={(e) => setSettingsForm({ ...form, opening_hours: e.target.value })}
+                    placeholder="Mon-Sat: 8:30am - 6:00pm"
+                  />
+                </div>
+              </div>
+              <Button className="mt-6" onClick={saveSettings} disabled={savingSettings}>
+                {savingSettings && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save shop details
+              </Button>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="tenants" className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-green-600" />
-                    Tenants ({users.filter(u => u.role === 'tenant').length})
-                  </CardTitle>
-                  <CardDescription>
-                    Manage registered tenants
-                  </CardDescription>
-                </div>
-                <AddUserDialog defaultRole="tenant" onSuccess={fetchDashboardData} />
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-4">Name</th>
-                        <th className="text-left p-4">Email</th>
-                        <th className="text-left p-4">Phone</th>
-                        <th className="text-left p-4">Status</th>
-                        <th className="text-left p-4">Joined</th>
-                        <th className="text-left p-4">Role</th>
-                        <th className="text-left p-4">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.filter(u => u.role === 'tenant').map((userData) => (
-                        <tr key={userData.id} className="border-b hover:bg-muted/50">
-                          <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
-                          <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
-                          <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
-                          <td className="p-4">
-                            <Badge className={userData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                              {userData.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </td>
-                          <td className="p-4 text-sm text-muted-foreground">
-                            {new Date(userData.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="p-4">
-                            <select
-                              value={userData.role}
-                              onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
-                              className="text-xs border rounded px-2 py-1 bg-background"
-                            >
-                              <option value="user">User</option>
-                              <option value="tenant">Tenant</option>
-                              <option value="landlord">Landlord</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </td>
-                          <td className="p-4">
-                            <Button
-                              size="sm"
-                              variant={userData.is_active ? "outline" : "default"}
-                              onClick={() => toggleUserActive(userData.user_id, userData.is_active || false)}
-                              className={userData.is_active ? "text-destructive hover:text-destructive" : ""}
-                            >
-                              {userData.is_active ? 'Deactivate' : 'Activate'}
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                      {users.filter(u => u.role === 'tenant').length === 0 && (
-                        <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No tenants registered</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="staff" className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-purple-600" />
-                    Staff / Admins ({users.filter(u => u.role === 'admin').length})
-                  </CardTitle>
-                  <CardDescription>
-                    Manage platform administrators
-                  </CardDescription>
-                </div>
-                <AddUserDialog defaultRole="admin" onSuccess={fetchDashboardData} />
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-4">Name</th>
-                        <th className="text-left p-4">Email</th>
-                        <th className="text-left p-4">Phone</th>
-                        <th className="text-left p-4">Status</th>
-                        <th className="text-left p-4">Joined</th>
-                        <th className="text-left p-4">Role</th>
-                        <th className="text-left p-4">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.filter(u => u.role === 'admin').map((userData) => (
-                        <tr key={userData.id} className="border-b hover:bg-muted/50">
-                          <td className="p-4 font-medium">{userData.full_name || 'N/A'}</td>
-                          <td className="p-4 text-sm text-muted-foreground">{userData.email}</td>
-                          <td className="p-4 text-sm text-muted-foreground">{userData.phone || 'N/A'}</td>
-                          <td className="p-4">
-                            <Badge className={userData.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}>
-                              {userData.is_active ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </td>
-                          <td className="p-4 text-sm text-muted-foreground">
-                            {new Date(userData.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="p-4">
-                            <select
-                              value={userData.role}
-                              onChange={(e) => updateUserRole(userData.user_id, e.target.value)}
-                              className="text-xs border rounded px-2 py-1 bg-background"
-                            >
-                              <option value="user">User</option>
-                              <option value="tenant">Tenant</option>
-                              <option value="landlord">Landlord</option>
-                              <option value="admin">Admin</option>
-                            </select>
-                          </td>
-                          <td className="p-4">
-                            <Button
-                              size="sm"
-                              variant={userData.is_active ? "outline" : "default"}
-                              onClick={() => toggleUserActive(userData.user_id, userData.is_active || false)}
-                              className={userData.is_active ? "text-destructive hover:text-destructive" : ""}
-                            >
-                              {userData.is_active ? 'Deactivate' : 'Activate'}
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                      {users.filter(u => u.role === 'admin').length === 0 && (
-                        <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No staff members</td></tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="properties" className="space-y-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Home className="h-5 w-5 text-orange-600" />
-                    Properties Management ({properties.length})
-                  </CardTitle>
-                  <CardDescription>
-                    Monitor all property listings and their status
-                  </CardDescription>
-                </div>
-                <AddPropertyDialog 
-                  landlords={users.filter(u => u.role === 'landlord').map(u => ({ user_id: u.user_id, full_name: u.full_name, email: u.email }))} 
-                  onSuccess={fetchDashboardData} 
-                />
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {properties.map((property) => (
-                    <Card key={property.id} className="overflow-hidden">
-                      <CardContent className="p-6">
-                        <div className="flex justify-between items-start mb-4">
-                          <h3 className="font-semibold text-foreground line-clamp-2">
-                            {property.title}
-                          </h3>
-                          <Badge className={getStatusColor(property.status)}>
-                            {property.status}
-                          </Badge>
-                        </div>
-                        
-                        <div className="space-y-2 mb-4">
-                          <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                            <MapPin className="h-4 w-4" />
-                            <span>{property.location}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-muted-foreground text-sm">
-                            <Calendar className="h-4 w-4" />
-                            <span>{new Date(property.created_at).toLocaleDateString()}</span>
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            <span className="font-medium">Owner:</span> {property.profiles?.full_name || 'N/A'}
-                          </div>
-                          <div className="text-sm text-muted-foreground">
-                            <span className="font-medium">Email:</span> {property.profiles?.email || 'N/A'}
-                          </div>
-                        </div>
-                        
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-lg font-bold text-primary">
-                            {formatPrice(property.rent_amount)}/month
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            {property.bedrooms} bed, {property.bathrooms} bath
-                          </span>
-                        </div>
-                        
-                        <div className="flex gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="flex-1"
-                            onClick={() => navigate(`/property/${property.id}`)}
-                          >
-                            <Eye className="h-4 w-4 mr-1" />
-                            View
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            className="flex-1"
-                            onClick={() => navigate(`/edit-property/${property.id}`)}
-                          >
-                            <Edit className="h-4 w-4 mr-1" />
-                            Edit
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
-                            onClick={() => deleteProperty(property.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="activity" className="space-y-6">
-            <ActivityLogs />
-          </TabsContent>
-
-          <TabsContent value="codes" className="space-y-6">
-            <ListingCodesManager />
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
+
+      <ProductFormDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        product={editing}
+        onSaved={refresh}
+      />
+
+      <AlertDialog open={!!deleting} onOpenChange={(open) => !open && setDeleting(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this product?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {deleting?.name} will be permanently removed from the shop.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <BottomNavigation />
     </div>
   );

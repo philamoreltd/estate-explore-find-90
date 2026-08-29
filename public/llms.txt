@@ -1,11 +1,10 @@
-# Housevilla
+# Laptop Hub Kenya
 
-> Housevilla is a US rental property marketplace where tenants discover apartments, studios, condos, townhouses and single-family homes, and landlords list and manage their properties.
-
-Housevilla helps renters across the United States find their next home with location-based search, verified listings, and a pay-to-unlock contact model that protects landlord privacy.
+> Laptop Hub Kenya is a Nairobi-based shop selling brand new, refurbished and ex-UK laptops plus accessories such as chargers, batteries, RAM, SSDs, bags, keyboards and docking stations. Prices are in Kenyan Shillings and orders are placed by WhatsApp or phone call.
 
 ## Pages
 
-- [Home](/): Overview of Housevilla and featured rental listings across the USA.
-- [Browse rentals](/browse): Search and filter all available properties by type, price, bedrooms, and distance.
-- [Sign in or sign up](/auth): Create an account or sign in to contact landlords and list properties.
+- [Home](/): Shop overview, featured stock and categories.
+- [Shop](/shop): Browse and filter all laptops and accessories by category, condition, brand and price.
+- [Contact](/contact): Phone, WhatsApp, email, shop location and opening hours.
+- [Sign in](/auth): Staff sign in for shop administration.
