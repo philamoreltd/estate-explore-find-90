@@ -66,8 +66,7 @@ const Auth = () => {
       newErrors.phone = "Please enter a valid phone number";
     }
 
-    if (false) {
-    }
+    
     
     if (!signUpData.password) {
       newErrors.password = "Password is required";
