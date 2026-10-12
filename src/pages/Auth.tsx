@@ -25,7 +25,7 @@ const Auth = () => {
     fullName: "",
     phone: "",
     confirmPassword: "",
-    role: "user"
+    role: ""
   });
   const [signInData, setSignInData] = useState({
     email: "",
@@ -66,7 +66,9 @@ const Auth = () => {
       newErrors.phone = "Please enter a valid phone number";
     }
 
-    
+    if (!signUpData.role) {
+      newErrors.role = "Please select your account type";
+    }
     
     if (!signUpData.password) {
       newErrors.password = "Password is required";
@@ -142,7 +144,7 @@ const Auth = () => {
         fullName: "",
         phone: "",
         confirmPassword: "",
-        role: "user"
+        role: ""
       });
       
     } catch (error: any) {
@@ -275,17 +277,17 @@ const Auth = () => {
   return (
     <main className="min-h-screen bg-gradient-to-br from-real-estate-gray/5 to-real-estate-blue/5 flex items-center justify-center p-4 pb-20 md:pb-4">
       <SEO
-        title="Sign in | Laptop Hub Kenya"
-        description="Sign in or create an account on Laptop Hub Kenya to manage shop stock and orders."
+        title="Sign in to Housevilla | Rentals in Kenya"
+        description="Sign in or create an account on Housevilla to contact landlords and list your rental properties."
         path="/auth"
         noindex
       />
-      <h1 className="sr-only">Sign in to Laptop Hub Kenya</h1>
+      <h1 className="sr-only">Sign in to Housevilla</h1>
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex items-center justify-center mb-4">
             <Home className="h-8 w-8 text-real-estate-blue mr-2" />
-            <span className="text-xl font-bold text-foreground">Laptop Hub Kenya</span>
+            <span className="text-xl font-bold text-foreground">Housevilla</span>
           </div>
           <CardTitle className="text-center">Welcome</CardTitle>
           <CardDescription className="text-center">
@@ -552,8 +554,44 @@ const Auth = () => {
                   )}
                 </div>
                 
-
-
+                <div className="space-y-2">
+                  <Label htmlFor="signup-role">Account Type</Label>
+                  <Select 
+                    value={signUpData.role} 
+                    onValueChange={(value) => setSignUpData({ ...signUpData, role: value })}
+                    disabled={isLoading}
+                  >
+                    <SelectTrigger>
+                      <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 text-muted-foreground" />
+                        <SelectValue placeholder="Choose your account type" />
+                      </div>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tenant">
+                        <div className="flex items-center gap-2">
+                          <User className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium">Tenant</div>
+                            <div className="text-sm text-muted-foreground">Looking for rental properties</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="landlord">
+                        <div className="flex items-center gap-2">
+                          <Home className="h-4 w-4" />
+                          <div>
+                            <div className="font-medium">Landlord</div>
+                            <div className="text-sm text-muted-foreground">Listing rental properties</div>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {errors.role && (
+                    <p className="text-sm text-destructive">{errors.role}</p>
+                  )}
+                </div>
                 
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
